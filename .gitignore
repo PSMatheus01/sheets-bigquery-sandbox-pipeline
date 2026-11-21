@@ -1,0 +1,349 @@
+# =============================================================================
+# SISTEMA OPERACIONAL
+# =============================================================================
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# =============================================================================
+# EDITORES E IDEs
+# =============================================================================
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+*.swp
+*.swo
+*.tmp
+*.temp
+*~
+.history/
+
+
+# =============================================================================
+# VARIÁVEIS DE AMBIENTE E CONFIGURAÇÕES LOCAIS
+# =============================================================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+
+config.local.*
+*.local.json
+*.local.yaml
+*.local.yml
+
+secrets/
+private/
+.local/
+
+
+# =============================================================================
+# CREDENCIAIS E MATERIAIS CRIPTOGRÁFICOS
+# =============================================================================
+
+credentials.json
+credentials-*.json
+credentials_*.json
+
+client_secret.json
+client_secret_*.json
+client-secret-*.json
+
+service-account.json
+service-account-*.json
+service_account*.json
+
+application_default_credentials.json
+adc.json
+
+oauth-token.json
+oauth_token.json
+access-token.json
+refresh-token.json
+
+token.json
+tokens.json
+token-*.json
+tokens-*.json
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+*.secret
+*.secrets
+
+
+# =============================================================================
+# GOOGLE APPS SCRIPT / CLASP
+# =============================================================================
+
+.clasp.json
+.clasprc.json
+.clasp_credentials.json
+.clasp-settings.json
+
+.clasp/
+.clasp-cache/
+clasp-debug.log
+
+# O manifesto genérico appsscript.json pode ser versionado.
+# O arquivo .claspignore também pode ser versionado.
+
+
+# =============================================================================
+# GOOGLE CLOUD
+# =============================================================================
+
+.gcloud/
+.google/
+config/gcloud/
+google-cloud-credentials.json
+google-credentials.json
+
+bq-job-*.json
+bigquery-job-*.json
+job-results-*.json
+
+
+# =============================================================================
+# NODE.JS
+# =============================================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.pnpm-store/
+
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+
+# =============================================================================
+# LOGS E REGISTROS DE EXECUÇÃO
+# =============================================================================
+
+*.log
+logs/
+log/
+
+cloud-logging-*.json
+cloud-logging-*.txt
+downloaded-logs-*
+execution-logs-*
+apps-script-logs-*
+
+coleta-*.txt
+diagnostico-*.txt
+diagnostic-*.txt
+
+error-report-*
+debug-output-*
+
+
+# =============================================================================
+# DADOS PRIVADOS, EXPORTAÇÕES E RESULTADOS BRUTOS
+# =============================================================================
+
+data/raw/
+data/private/
+data/production/
+data/sensitive/
+
+exports/
+export/
+downloads/
+download/
+
+results/raw/
+results/private/
+
+evidence/raw/
+evidence/private/
+
+output/private/
+output/raw/
+
+*.private.csv
+*.private.json
+*.private.txt
+
+production-*.csv
+production-*.json
+production-*.txt
+
+real-data-*
+customer-data-*
+client-data-*
+
+
+# =============================================================================
+# BACKUPS, DUMPS E ARQUIVOS DE RECUPERAÇÃO
+# =============================================================================
+
+backups/
+backup/
+dumps/
+dump/
+recovery/
+restore/
+
+*.dump
+*.bak
+*.backup
+*.old
+*.orig
+
+*.sql.gz
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+pg_dump*
+database-dump*
+repository-backup*
+
+
+# =============================================================================
+# ARQUIVOS TEMPORÁRIOS E DE PROCESSAMENTO
+# =============================================================================
+
+tmp/
+temp/
+temporary/
+scratch/
+work/
+
+*.part
+*.crdownload
+*.download
+*.cache
+
+*.pid
+*.pid.lock
+*.lock.local
+
+
+# =============================================================================
+# TESTES E RELATÓRIOS GERADOS
+# =============================================================================
+
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+junit.xml
+
+reports/private/
+reports/generated/
+
+benchmark/raw/
+benchmark/private/
+
+
+# =============================================================================
+# DOCKER E AMBIENTES LOCAIS
+# =============================================================================
+
+docker-compose.override.yml
+compose.override.yml
+
+docker-data/
+volumes/
+postgres-data/
+database-data/
+
+
+# =============================================================================
+# TERRAFORM E INFRAESTRUTURA
+# =============================================================================
+
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl.local
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+crash.log
+crash.*.log
+
+
+# =============================================================================
+# ARQUIVOS DE SISTEMA E HISTÓRICOS LOCAIS
+# =============================================================================
+
+.bash_history
+.zsh_history
+.python_history
+.node_repl_history
+
+*.history
+.history/
+
+
+# =============================================================================
+# ARQUIVOS GERADOS POR FERRAMENTAS DE SEGURANÇA
+# =============================================================================
+
+.gitleaks-report.json
+.gitleaks-report.sarif
+.trufflehog/
+.secretlintcache
+
+security-scan-results/
+security-reports/private/
+
+
+# =============================================================================
+# EXCEÇÕES PÚBLICAS PERMITIDAS
+# =============================================================================
+
+# Exemplos sanitizados e fictícios podem ser versionados.
+!examples/
+!examples/**
+
+# Configurações explicitamente identificadas como exemplo podem ser versionadas.
+!*.example.json
+!*.example.yaml
+!*.example.yml
+!*.example.env
+!*.sample.json
+!*.sample.yaml
+!*.sample.yml
+
+# Dados sintéticos destinados à demonstração podem ser versionados.
+!examples/synthetic-data/
+!examples/synthetic-data/**
