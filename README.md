@@ -4,17 +4,16 @@
 
 # Google Sheets to BigQuery Sandbox Pipeline
 
-### Externalização do processamento de planilhas por meio de um pipeline auditável com Google Apps Script e BigQuery Sandbox
+### Externalização controlada do processamento de planilhas com Google Apps Script e BigQuery Sandbox
 
-**Estudo técnico • Prova de conceito • Padrões reutilizáveis**
+**Estudo técnico · Prova de conceito validada · Exemplos reproduzíveis**
 
-<br>
-
-![Type](https://img.shields.io/badge/type-technical%20study-blue)
-![BigQuery](https://img.shields.io/badge/BigQuery-Sandbox-4285F4)
-![Apps Script](https://img.shields.io/badge/Google-Apps%20Script-34A853)
-![Data](https://img.shields.io/badge/data-synthetic%20and%20anonymized-success)
-![License](https://img.shields.io/badge/license-under%20review-lightgrey)
+[![Type](https://img.shields.io/badge/type-technical%20study-2563EB)](docs/methodology.md)
+[![Status](https://img.shields.io/badge/status-validated%20PoC-16A34A)](docs/results.md)
+[![BigQuery](https://img.shields.io/badge/BigQuery-Sandbox-4285F4)](docs/sandbox-and-billing.md)
+[![Apps Script](https://img.shields.io/badge/Google-Apps%20Script-34A853)](src/apps-script/)
+[![Data](https://img.shields.io/badge/data-synthetic-0F766E)](examples/synthetic-data/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-D22128)](LICENSE)
 
 </div>
 
@@ -22,443 +21,312 @@
 
 ## Visão geral
 
-Este repositório documenta um estudo técnico sobre a modernização de processos baseados em planilhas.
+Este repositório documenta uma prova de conceito sobre a externalização de cálculos, regras, validações e agregações originalmente concentrados em planilhas.
 
-A investigação partiu de uma estrutura com milhares de fórmulas, buscas, regras condicionais e tratamentos distribuídos por dezenas de milhares de linhas.
+A arquitetura experimental utilizou:
+
+- **Google Sheets** como origem mantida somente para leitura;
+- **Google Apps Script** como camada de detecção, controle e orquestração;
+- **BigQuery Sandbox** como mecanismo analítico;
+- estruturas candidatas e oficiais para promoção controlada;
+- ambiente shadow para publicação isolada;
+- assinaturas, contagens e auditorias para validação;
+- estados persistidos para recuperação de incidentes;
+- dados sintéticos nos exemplos reproduzíveis.
 
 A pergunta central foi:
 
-> **Até onde é possível retirar cálculos e regras de uma planilha, processá-los externamente e construir um pipeline recorrente, auditável e recuperável utilizando Google Apps Script e BigQuery Sandbox?**
-
-A prova de conceito utilizou:
-
-- **Google Sheets** como origem somente para leitura;
-- **Google Apps Script** como camada de detecção e orquestração;
-- **BigQuery Sandbox** como mecanismo de processamento;
-- uma planilha isolada como ambiente de validação;
-- **Cloud Logging** como fonte de observabilidade;
-- estados persistidos, assinaturas e auditorias como mecanismos de controle.
+> **Até onde é possível retirar cálculos e regras de uma planilha, processá-los externamente e construir um pipeline recorrente, auditável e recuperável com Google Apps Script e BigQuery Sandbox?**
 
 > [!IMPORTANT]
-> Este é um estudo técnico independente. O repositório não contém dados reais, credenciais, identificadores operacionais, configurações privadas ou código de produtos internos.
+> Este é um estudo técnico independente e uma prova de conceito. O repositório não representa uma aplicação transacional pronta para produção e não contém dados reais, credenciais, identificadores operacionais ou código de produtos internos.
 
 ---
 
 ## Navegação
 
-- [Contexto](#contexto)
+- [Problema estudado](#problema-estudado)
 - [Hipótese avaliada](#hipótese-avaliada)
 - [Arquitetura experimental](#arquitetura-experimental)
-- [Fluxo operacional](#fluxo-operacional)
-- [Metodologia](#metodologia)
-- [Resultados](#resultados)
+- [Resultados principais](#resultados-principais)
+- [Baseline de fórmulas](#baseline-de-fórmulas)
 - [Performance](#performance)
 - [Consumo do BigQuery](#consumo-do-bigquery)
-- [Publicação controlada](#publicação-controlada)
-- [Incidentes e aprendizados](#incidentes-e-aprendizados)
-- [BigQuery Sandbox](#bigquery-sandbox)
-- [Cenário com faturamento](#cenário-com-faturamento)
-- [Casos de uso](#casos-de-uso)
-- [Quando não utilizar](#quando-não-utilizar)
+- [Incidentes e recuperação](#incidentes-e-recuperação)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Reprodução segura](#reprodução-segura)
+- [Documentação](#documentação)
+- [Aplicabilidade](#aplicabilidade)
+- [Limitações](#limitações)
 - [Segurança e privacidade](#segurança-e-privacidade)
-- [Conclusões](#conclusões)
+- [Conclusão](#conclusão)
 - [Referências](#referências)
 - [Licença](#licença)
 
 ---
 
-# Contexto
+## Problema estudado
 
-Planilhas são excelentes ferramentas para:
+Planilhas são adequadas para exploração, prototipação, análises rápidas e validação de hipóteses.
 
-- exploração;
-- prototipação;
-- análises rápidas;
-- validação de hipóteses;
-- construção inicial de processos;
-- colaboração;
-- experimentação.
+Entretanto, sua manutenção tende a se tornar mais complexa quando uma única estrutura passa a concentrar simultaneamente:
 
-Entretanto, quando uma planilha passa a concentrar simultaneamente dados, regras, fórmulas, indicadores e experiência operacional, sua manutenção pode se tornar progressivamente mais complexa.
+- dados;
+- fórmulas;
+- regras;
+- buscas;
+- normalizações;
+- indicadores;
+- exceções;
+- experiência operacional;
+- conhecimento não documentado.
 
-Entre os sinais observados no estudo estavam:
+A estrutura analisada apresentava:
 
-- fórmulas copiadas por milhares de linhas;
+- fórmulas replicadas por milhares de linhas;
 - buscas massivas;
 - regras condicionais aninhadas;
-- diferentes padrões de fórmula na mesma coluna;
-- células apresentando erros;
+- padrões diferentes de fórmula na mesma coluna;
+- células com erro;
 - latência variável;
 - dificuldade de versionar regras;
-- risco de alteração manual da estrutura;
+- risco de alterações manuais;
 - dependência de conhecimento especializado.
 
-## Baseline estrutural anonimizada
-
-O inventário utilizado como referência encontrou aproximadamente:
+### Baseline estrutural
 
 | Métrica | Resultado observado |
 |---|---:|
-| Linhas | 75,6 mil |
+| Linhas | 75.595 |
 | Colunas | 35 |
-| Células consideradas | 2,65 milhões |
-| Fórmulas | 146,7 mil |
+| Células consideradas | 2.645.825 |
+| Fórmulas | 146.701 |
 | Densidade de fórmulas | 5,54% |
 | Colunas com fórmulas | 5 |
 | Células apresentando erros | 18 |
 | Colunas com padrões misturados | 1 |
 
-## Funções identificadas
+### Funções identificadas
 
-| Função | Ocorrências aproximadas |
+| Função | Ocorrências |
 |---|---:|
-| `IF` | 173,2 mil |
-| `SUBSTITUTE` | 151,2 mil |
-| `VALUE` | 75,6 mil |
-| `XLOOKUP` | 64,5 mil |
-| `COUNTIFS` | 5,1 mil |
+| `IF` | 173.158 |
+| `SUBSTITUTE` | 151.188 |
+| `VALUE` | 75.594 |
+| `XLOOKUP` | 64.523 |
+| `COUNTIFS` | 5.129 |
 | `IMPORTRANGE` | 1 |
 
 > [!NOTE]
-> Uma fórmula pode conter várias funções. Por isso, a soma das ocorrências é superior ao total de fórmulas.
+> Uma fórmula pode conter várias funções. Por isso, a soma das ocorrências de funções é superior ao total de fórmulas.
+
+Os detalhes da medição estão em [`evidence/formula-baseline-summary.json`](evidence/formula-baseline-summary.json).
 
 ---
 
-# Hipótese avaliada
+## Hipótese avaliada
 
 A hipótese principal foi:
 
 > **É possível manter a planilha de origem somente para leitura, executar limpeza, transformação, regras e agregações no BigQuery e publicar apenas resultados previamente validados?**
 
-O estudo também buscou compreender:
+O experimento também avaliou:
 
-1. se o fluxo poderia operar de forma recorrente;
-2. se mudanças poderiam ser detectadas sem consultar todas as células;
-3. se falhas parciais poderiam bloquear o avanço;
-4. se publicações poderiam ser auditadas;
-5. se incidentes poderiam ser recuperados sem duplicação;
-6. qual seria o consumo do BigQuery;
-7. quais seriam os limites do sandbox sem faturamento;
-8. quais padrões poderiam ser adaptados para outros contextos.
+1. detecção de mudanças sem leitura integral das células;
+2. recorrência por gatilhos controlados;
+3. persistência de estados;
+4. separação entre gerações candidatas e oficiais;
+5. bloqueio diante de inconsistências;
+6. backups anteriores à promoção;
+7. publicação sem fórmulas;
+8. auditoria posterior;
+9. recuperação sem duplicação;
+10. encerramento automático;
+11. consumo do BigQuery Sandbox;
+12. padrões reutilizáveis em outros contextos.
 
 ---
 
-# Arquitetura experimental
+## Arquitetura experimental
 
-O experimento separou origem, processamento, validação e publicação.
+O fluxo validado separou a origem, a orquestração, o processamento, a validação e a publicação.
 
-```text
-┌─────────────────────────────────────────┐
-│ Google Sheets                           │
-│ Origem mantida somente para leitura     │
-└───────────────────┬─────────────────────┘
-                    │
-                    │ Detecção de mudanças
-                    ▼
-┌─────────────────────────────────────────┐
-│ Google Apps Script                      │
-│ Orquestração, estados e controle        │
-└───────────────────┬─────────────────────┘
-                    │
-                    │ Captura validada
-                    ▼
-┌─────────────────────────────────────────┐
-│ BigQuery Sandbox                        │
-│ Tabelas candidatas                      │
-│ Limpeza, regras e agregações            │
-└───────────────────┬─────────────────────┘
-                    │
-                    │ Contagens e assinaturas
-                    ▼
-┌─────────────────────────────────────────┐
-│ Validação e promoção                    │
-│ Candidata → estrutura oficial           │
-└───────────────────┬─────────────────────┘
-                    │
-                    │ Publicação aprovada
-                    ▼
-┌─────────────────────────────────────────┐
-│ Planilha de validação isolada           │
-│ Valores estáticos e sem fórmulas        │
-└───────────────────┬─────────────────────┘
-                    │
-                    │ Auditoria
-                    ▼
-┌─────────────────────────────────────────┐
-│ Ciclo concluído                         │
-│ Integridade e resíduos verificados      │
-└─────────────────────────────────────────┘
-```
+| Camada | Tecnologia ou estrutura | Responsabilidade |
+|---|---|---|
+| Origem | Google Sheets | Fonte mantida somente para leitura |
+| Detecção | Google Apps Script | Leitura de metadados e confirmação de mudanças |
+| Orquestração | Google Apps Script | Estados, locks, preflights e controle do ciclo |
+| Entrada | BigQuery Sandbox | Estruturas raw e candidatas |
+| Transformação | GoogleSQL | Limpeza, normalização e regras |
+| Saídas analíticas | BigQuery | Indicadores, divergências e exceções |
+| Validação | Contagens e assinaturas | Comparação entre gerações |
+| Promoção | Tabelas e views | Substituição controlada da geração oficial |
+| Publicação | Ambiente shadow | Valores estáticos e sem fórmulas |
+| Auditoria | Apps Script e BigQuery | Integridade, resíduos e estado final |
+| Recuperação | Estados e backups | Retomada controlada após incidente |
 
-## Princípios adotados
+Fluxo resumido:
+
+**Origem somente leitura → Detecção → Orquestração → Raw → Clean → Rules → Indicators/Exceptions → Auditoria → Shadow → Encerramento**
+
+### Princípios adotados
 
 - origem somente para leitura;
-- separação entre estruturas candidatas e oficiais;
+- separação entre candidatas e oficiais;
 - nenhuma publicação sem validação;
-- backups antes de promoções;
+- backup antes da promoção;
 - estados persistidos;
 - operações idempotentes;
 - assinaturas de conteúdo;
-- bloqueio diante de inconsistência;
+- falha preservada;
+- recuperação controlada;
 - auditoria posterior;
-- encerramento automático de gatilhos;
+- remoção seletiva de resíduos;
 - ausência de fórmulas nas saídas técnicas.
 
----
+### Documentos de arquitetura
 
-# Fluxo operacional
-
-O ciclo foi dividido em etapas independentes.
-
-```text
-┌──────────────────────────────┐
-│ 1. Detecção de mudança       │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 2. Captura do snapshot       │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 3. Validação da candidata    │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 4. Criação das views         │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 5. Validação das views       │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 6. Backup das estruturas     │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 7. Promoção nativa           │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 8. Validação pós-promoção    │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 9. Decisão de publicação     │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 10. Publicação isolada       │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 11. Validação da publicação  │
-└──────────────┬───────────────┘
-               ▼
-┌──────────────────────────────┐
-│ 12. Finalização do ciclo     │
-└──────────────────────────────┘
-```
-
-Uma etapa somente avançava quando a etapa anterior estava aprovada.
-
-Em caso de inconsistência:
-
-```text
-Falha detectada
-      │
-      ▼
-Estado preservado
-      │
-      ▼
-Diagnóstico
-      │
-      ├── Correção controlada
-      │
-      ├── Recuperação por metadados
-      │
-      └── Rollback, quando aplicável
-      │
-      ▼
-Nova validação
-```
+- [Estado observado](architecture/current-state.md)
+- [Fluxo de dados](architecture/data-flow.md)
+- [Pipeline experimental](architecture/experimental-pipeline.md)
+- [Máquina de estados](architecture/state-machine.md)
+- [Arquitetura consolidada](docs/architecture.md)
 
 ---
 
-# Metodologia
+## Resultados principais
 
-O estudo foi composto por duas avaliações complementares.
+A janela automatizada permaneceu ativa por aproximadamente 48 horas.
 
-## 1. Janela operacional automatizada
+| Evidência | Resultado |
+|---|---:|
+| Ciclos operacionais concluídos | 10 |
+| Ciclos aprovados | 10 |
+| Resultados operacionais acumulados | 32 |
+| Resultados aprovados no consolidado | 31 |
+| Auditoria automática de integridade | Aprovada |
+| Escritas na origem | 0 |
+| Fórmulas nas saídas técnicas | 0 |
+| Gatilhos residuais ao final | 0 |
+| Concessões residuais ao final | 0 |
+| Leases residuais ao final | 0 |
+| Estado final | Concluído e saudável |
 
-Duração:
+### Capacidades comprovadas
 
-```text
-48 horas
-```
+- detecção de mudanças;
+- confirmação temporal da mudança;
+- captura controlada;
+- validação de esquema;
+- criação de estruturas candidatas;
+- criação e validação de views;
+- aplicação de regras;
+- backup antes da promoção;
+- promoção controlada;
+- validação pós-promoção;
+- publicação sem fórmulas;
+- sanitização de textos;
+- assinaturas de conteúdo;
+- auditoria automática;
+- bloqueio de inconsistências;
+- recuperação de incidentes;
+- remoção de resíduos;
+- encerramento automático.
 
-Objetivos:
+O consolidado técnico está disponível em [`docs/results.md`](docs/results.md).
 
-- observar recorrência;
-- executar ciclos automáticos;
-- medir performance;
-- medir consumo;
-- validar auditoria;
-- testar encerramento automático;
-- observar falhas e recuperações.
+As evidências sanitizadas estão disponíveis em:
 
-## 2. Baseline da planilha com fórmulas
+- [`evidence/experimental-summary.json`](evidence/experimental-summary.json)
+- [`evidence/performance-summary.json`](evidence/performance-summary.json)
+- [`evidence/test-matrix.md`](evidence/test-matrix.md)
 
-Duração:
+---
 
-```text
-24 horas
-```
+## Baseline de fórmulas
 
-Configuração:
+A baseline foi coletada durante aproximadamente 24 horas, em modo somente leitura.
 
-- amostras a cada 15 minutos;
-- 96 amostras esperadas;
-- 96 amostras realizadas;
-- cobertura de 100%;
-- zero falhas.
+| Métrica | Resultado |
+|---|---:|
+| Intervalo entre amostras | 15 minutos |
+| Amostras esperadas | 96 |
+| Amostras realizadas | 96 |
+| Cobertura | 100% |
+| Falhas de coleta | 0 |
+| Escritas na origem | 0 |
+| Fórmulas inventariadas | 146.701 |
+| Células com erro | 18 |
 
-Objetivos:
+### Erros observados
 
-- inventariar fórmulas;
-- identificar funções;
-- contar erros;
-- observar variação estrutural;
-- medir latência de leitura;
-- construir uma referência empírica.
+| Tipo | Quantidade |
+|---|---:|
+| `#REF!` | 8 |
+| `#VALUE!` | 4 |
+| `#ERROR!` | 6 |
 
 > [!NOTE]
-> Parte da baseline ocorreu fora do expediente. Os resultados devem ser interpretados como uma amostra exploratória de curto período, e não como uma medição definitiva de todos os picos operacionais.
+> Parte da baseline ocorreu fora do expediente. Os resultados representam uma amostra exploratória de curto período e não uma medição definitiva de todos os picos operacionais.
 
 ---
 
-# Resultados
-
-## Capacidades validadas
-
-| Capacidade | Resultado |
-|---|---|
-| Detecção de mudanças | Validada |
-| Captura da origem | Validada |
-| Validação de esquema | Validada |
-| Criação de tabelas candidatas | Validada |
-| Criação de views | Validada |
-| Aplicação de regras | Validada |
-| Backup antes da promoção | Validado |
-| Promoção controlada | Validada |
-| Publicação sem fórmulas | Validada |
-| Sanitização de textos | Validada |
-| Assinaturas de conteúdo | Validadas |
-| Auditoria automática | Validada |
-| Bloqueio de inconsistências | Validado |
-| Recuperação de incidente | Validada |
-| Remoção de resíduos | Validada |
-| Encerramento automático | Validado |
-| Produção somente para leitura | Preservada |
-
-## Janela automatizada
-
-O consolidado final registrou:
-
-- 48 horas de avaliação;
-- dez ciclos operacionais;
-- dez ciclos associados a mudanças;
-- encerramento automático;
-- remoção segura do gatilho;
-- ausência de concessões residuais;
-- ausência de leases residuais;
-- estado final concluído e saudável.
-
-## Auditoria
-
-A auditoria verificou:
-
-- estruturas publicadas;
-- assinaturas;
-- contagens;
-- abas técnicas;
-- fórmulas;
-- resíduos;
-- preservação das abas de negócio;
-- ausência de alteração na produção.
-
-Resultado:
-
-```text
-INTEGRIDADE APROVADA
-```
-
----
-
-# Performance
+## Performance
 
 O consolidado reuniu 30 amostras de etapas persistidas.
 
-| Métrica | Resultado aproximado |
+| Métrica | Resultado |
 |---|---:|
 | Média | 12,72 s |
 | Mediana | 2,27 s |
-| 95% das amostras | Até 62,32 s |
+| P95 | 62,32 s |
 | Mínimo | 0,30 s |
 | Máximo | 92,08 s |
-| Abaixo da meta interna de 25 s | 86,67% |
+| Amostras abaixo da meta interna de 25 s | 86,67% |
 
-## Interpretação
+**P95** representa a duração abaixo da qual ficaram 95% das amostras observadas.
 
-A mediana inferior à média demonstra que a maioria das etapas foi rápida, enquanto algumas operações mais pesadas elevaram a média.
+A diferença entre média e mediana indica que a maioria das etapas foi rápida, enquanto algumas operações mais pesadas elevaram a média.
 
 As etapas mais demoradas estavam associadas a:
 
-- publicação de grande quantidade de células;
+- publicação de células no Google Sheets;
 - captura de snapshot;
 - promoção de estruturas;
-- validação pós-promoção.
+- validação pós-promoção;
+- recuperação da publicação.
 
-O principal gargalo observado foi a gravação de resultados no Google Sheets, e não o processamento analítico no BigQuery.
-
-## Baseline de leitura da planilha
-
-### Abertura
+### Publicação observada
 
 | Métrica | Resultado |
 |---|---:|
-| Média | 6,10 s |
-| 95% das amostras | Até 10,98 s |
-| Máximo | 13,89 s |
+| Linhas publicadas | 9.009 |
+| Células publicadas | 114.575 |
+| Fórmulas publicadas | 0 |
+| Valores sanitizados | 2.340 |
+| Duração | 87,4 s |
 
-### Leitura de regiões amostradas
-
-| Métrica | Resultado |
-|---|---:|
-| Média | 3,12 s |
-| 95% das amostras | Até 5,59 s |
-| Máximo | 9,43 s |
-
-> [!NOTE]
-> O Apps Script não expõe o tempo integral de recálculo interno do Google Sheets. Esses valores medem a interação de leitura, e não o recálculo completo das fórmulas.
+O principal gargalo observado foi a publicação no Google Sheets, não o processamento analítico no BigQuery.
 
 ---
 
-# Consumo do BigQuery
+## Consumo do BigQuery
 
-## Ciclo recente
+Um ciclo aprovado utilizado como referência apresentou:
 
-| Métrica | Resultado aproximado |
+| Métrica | Resultado |
 |---|---:|
 | Jobs | 13 |
 | Jobs com processamento | 9 |
-| Dados processados | 84,7 MiB |
-| Dados faturáveis | 173 MiB |
-| Percentual de 1 TiB | 0,0165% |
+| Bytes processados | 88.789.912 |
+| Volume processado aproximado | 84,7 MiB |
+| Bytes faturáveis informados | 181.403.648 |
+| Volume faturável aproximado | 173 MiB |
+| Proporção aproximada de 1 TiB | 0,0165% |
 
-## Projeções mensais
+O ambiente permaneceu sem faturamento habilitado. A métrica de bytes faturáveis representa o volume que seria considerado pelo modelo sob demanda, não uma cobrança realizada.
 
-Mantido o consumo unitário observado:
+### Projeções
 
 | Frequência hipotética | Projeção aproximada |
 |---|---:|
@@ -468,373 +336,221 @@ Mantido o consumo unitário observado:
 | 96 ciclos por dia | 486,6 GiB/mês |
 
 > [!WARNING]
-> As projeções não representam consumo garantido. Volume, consultas, tabelas, regras e frequência podem alterar significativamente os resultados.
+> As projeções não representam consumo medido nem garantia operacional. Volume, frequência, consultas, tabelas e regras podem alterar significativamente o resultado.
+
+A análise completa está em [`docs/sandbox-and-billing.md`](docs/sandbox-and-billing.md).
 
 ---
 
-# Publicação controlada
+## Incidentes e recuperação
 
-Uma publicação recente processou aproximadamente:
+Os incidentes fizeram parte da validação da arquitetura.
 
-| Métrica | Resultado |
-|---|---:|
-| Linhas publicadas | 9 mil |
-| Células publicadas | 114,6 mil |
-| Fórmulas publicadas | 0 |
-| Textos sanitizados | 2,3 mil |
-| Duração | 87,4 s |
+### Incidentes documentados
 
-Os textos foram sanitizados para evitar interpretação indevida como fórmulas pelo Google Sheets.
+- divergência histórica em views com janela temporal móvel;
+- janela anterior persistida impedindo uma nova ativação;
+- validação pós-promoção incompatível com o subconjunto temporal;
+- entrada controlada em estado de falha preservada;
+- retomada do mesmo ciclo após correção;
+- recuperação de publicação;
+- remoção seletiva de staging temporário;
+- etapas acima da meta interna de performance.
 
-## Resultado central
+### Comportamentos comprovados
 
-Foi comprovado que era possível:
+- a falha interrompeu o avanço;
+- o estado foi preservado;
+- os backups foram mantidos;
+- o gatilho relacionado foi removido;
+- a produção permaneceu em somente leitura;
+- a retomada exigiu preflight;
+- a autorização manual permaneceu fechada por padrão;
+- a geração promovida foi revalidada;
+- o ciclo foi concluído após a recuperação.
 
-- executar o processamento fora da planilha;
-- publicar valores estáticos;
-- eliminar fórmulas das saídas técnicas;
-- conferir contagens;
-- validar assinaturas;
-- identificar divergências;
-- preservar versões anteriores.
-
----
-
-# Incidentes e aprendizados
-
-Os incidentes foram tratados como parte da validação da arquitetura.
-
-## Consolidação incompleta de assinaturas
-
-Uma publicação foi promovida, mas a consolidação das assinaturas falhou.
-
-**Aprendizado:** operações parciais precisam ser retomáveis sem duplicar ou reexecutar desnecessariamente a publicação.
-
-## Recurso temporário residual
-
-Uma estrutura temporária de tentativa anterior permaneceu no destino.
-
-**Aprendizado:** recursos temporários precisam de identificação, inventário e limpeza segura.
-
-## Validação incompatível com janela temporal
-
-Uma view temporal foi comparada como se devesse conter todas as linhas da origem.
-
-**Aprendizado:** validações precisam considerar a semântica da regra, e não apenas igualdade numérica.
-
-## Comparação de conteúdo dinâmico
-
-Views baseadas em data corrente mudaram legitimamente com o tempo.
-
-**Aprendizado:** estruturas dinâmicas não devem ser auditadas como snapshots imutáveis.
-
-## Resultado dos incidentes
-
-Os incidentes foram:
-
-- detectados;
-- preservados;
-- investigados;
-- corrigidos;
-- documentados;
-- revalidados.
-
-O estado final permaneceu saudável e aprovado.
+Os detalhes estão em [`docs/incidents-and-recovery.md`](docs/incidents-and-recovery.md).
 
 ---
 
-# BigQuery Sandbox
+## Estrutura do repositório
 
-O BigQuery Sandbox permite testar recursos do BigQuery sem fornecer cartão de crédito ou vincular uma conta de faturamento.
-
-No volume estudado, foi possível:
-
-- criar tabelas;
-- criar views;
-- executar consultas;
-- aplicar transformações;
-- validar resultados;
-- realizar auditorias;
-- operar ciclos recorrentes;
-- permanecer abaixo da cota mensal gratuita projetada.
-
-## Limitações relevantes
-
-Segundo a documentação oficial, o sandbox possui limitações como:
-
-- limite de armazenamento;
-- expiração automática de tabelas, views e partições;
-- ausência de streaming;
-- ausência de DML;
-- indisponibilidade do BigQuery Data Transfer Service.
-
-> [!IMPORTANT]
-> O estudo demonstrou viabilidade no volume experimental. Isso não torna o sandbox automaticamente adequado para retenção permanente ou produção crítica.
-
----
-
-# Cenário com faturamento
-
-Habilitar faturamento amplia os recursos disponíveis:
-
-- armazenamento adicional;
-- retenção permanente;
-- DML;
-- streaming;
-- cargas incrementais;
-- serviços de transferência;
-- maior capacidade de crescimento.
-
-Entretanto, faturamento não resolve problemas inerentes ao uso da planilha como interface:
-
-- edição humana;
-- fórmulas divergentes;
-- estrutura mutável;
-- experiência genérica;
-- regras distribuídas;
-- dificuldade de versionamento;
-- gargalos de leitura e escrita.
-
-Uma operação com faturamento também exige:
-
-- orçamento;
-- alertas;
-- limites de consulta;
-- `maximumBytesBilled`;
-- particionamento;
-- clustering;
-- revisão de permissões;
-- monitoramento;
-- governança;
-- estratégia de retenção.
-
----
-
-# Casos de uso
-
-Os casos de uso foram classificados conforme o nível de evidência.
-
-| Classificação | Significado |
+| Caminho | Conteúdo |
 |---|---|
-| **Validado** | Implementado e observado no estudo |
-| **Adaptável** | Reutiliza o mesmo padrão, mas não foi testado diretamente |
-| **Revisão necessária** | Exige outra arquitetura, faturamento ou validação adicional |
+| [`architecture/`](architecture/) | Estado observado, fluxo, pipeline e máquina de estados |
+| [`docs/`](docs/) | Documentação técnica consolidada |
+| [`evidence/`](evidence/) | Evidências sanitizadas e resumos experimentais |
+| [`examples/configurations/`](examples/configurations/) | Configuração sintética do Sandbox |
+| [`examples/expected-output/`](examples/expected-output/) | Resultados esperados |
+| [`examples/synthetic-data/`](examples/synthetic-data/) | Dados inteiramente sintéticos |
+| [`src/apps-script/`](src/apps-script/) | Exemplos sanitizados de Apps Script |
+| [`src/sql/`](src/sql/) | Pipeline SQL reproduzível |
+| [`templates/`](templates/) | Templates de implementação, risco, testes e incidentes |
+| [`assets/`](assets/) | Capa e elementos visuais |
 
-## 1. Externalização de fórmulas
+### Componentes SQL
 
-**Classificação:** Validado
+| Ordem | Arquivo | Função |
+|---:|---|---|
+| 1 | [`01_raw_example.sql`](src/sql/01_raw_example.sql) | Estruturas raw |
+| 2 | [`02_clean_example.sql`](src/sql/02_clean_example.sql) | Limpeza e conversões |
+| 3 | [`03_rules_example.sql`](src/sql/03_rules_example.sql) | Regras e classificações |
+| 4 | [`04_indicators_example.sql`](src/sql/04_indicators_example.sql) | Indicadores |
+| 5 | [`05_exceptions_example.sql`](src/sql/05_exceptions_example.sql) | Divergências e exceções |
+| 6 | [`06_audit_example.sql`](src/sql/06_audit_example.sql) | Auditoria consolidada |
 
-Possibilidades:
+### Componentes Apps Script
 
-- buscas;
-- contagens condicionais;
-- normalizações;
-- classificações;
-- filtros;
-- regras;
-- agregações.
+| Arquivo | Função |
+|---|---|
+| [`config.example.gs`](src/apps-script/config.example.gs) | Configuração sanitizada |
+| [`utilities.example.gs`](src/apps-script/utilities.example.gs) | Utilitários e consultas |
+| [`detector.example.gs`](src/apps-script/detector.example.gs) | Detecção de mudanças |
+| [`orchestrator.example.gs`](src/apps-script/orchestrator.example.gs) | Máquina de estados |
+| [`publisher.example.gs`](src/apps-script/publisher.example.gs) | Publicação sintética opcional |
+| [`auditor.example.gs`](src/apps-script/auditor.example.gs) | Auditoria somente leitura |
 
-## 2. Qualidade de dados
+---
 
-**Classificação:** Validado
+## Reprodução segura
 
-Detecção de:
+Os exemplos foram preparados para estudo e validação com dados sintéticos.
 
-- datas inválidas;
-- campos vazios;
-- padrões incorretos;
-- duplicidades;
-- divergências;
-- registros incompletos;
-- valores fora de domínio.
+### Pré-requisitos
 
-## 3. Reconciliação entre bases
+- acesso a um projeto Google Cloud controlado pelo executor;
+- BigQuery Sandbox ou BigQuery habilitado;
+- permissão para criar um dataset de teste;
+- Google Apps Script com runtime V8;
+- serviço avançado do BigQuery quando os exemplos de Apps Script forem utilizados.
 
-**Classificação:** Validado
+### Ordem recomendada
 
-Comparação entre:
+1. leia [`examples/synthetic-data/README.md`](examples/synthetic-data/README.md);
+2. revise [`sandbox-config.example.json`](examples/configurations/sandbox-config.example.json);
+3. carregue os arquivos sintéticos;
+4. execute os scripts SQL na ordem `01` a `06`;
+5. compare os resultados com [`examples/expected-output/`](examples/expected-output/);
+6. consulte a view de auditoria;
+7. revise os exemplos de Apps Script;
+8. mantenha a publicação desabilitada até concluir o preflight;
+9. utilize apenas destinos identificados como sintéticos.
 
-- origem e destino;
-- versão anterior e atual;
-- total esperado e realizado;
-- assinaturas;
-- sistemas;
-- períodos.
+> [!CAUTION]
+> Os identificadores dos exemplos são documentais. Antes de executar qualquer script, confirme projeto, dataset, região, permissões, retenção e destino. Não execute os exemplos contra uma origem ou destino real sem revisão técnica específica.
 
-## 4. Detecção de exceções
+### Resultado sintético esperado
 
-**Classificação:** Validado
+O conjunto principal contém 24 registros preparados para produzir:
 
-Geração de listas de:
+| Classificação | Quantidade |
+|---|---:|
+| `VALID` | 8 |
+| `DIVERGENCE` | 3 |
+| `EXCEPTION` | 11 |
+| `DUPLICATE` | 1 |
+| `OUT_OF_WINDOW` | 1 |
+| **Total** | **24** |
 
-- registros rejeitados;
-- regras não atendidas;
-- divergências;
-- casos sem correspondência;
-- itens que exigem intervenção.
+A auditoria sintética espera aprovação integral dos controles definidos no exemplo.
 
-## 5. Indicadores periódicos
+---
 
-**Classificação:** Validado
+## Documentação
 
-Cálculo de:
+| Documento | Conteúdo |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | Arquitetura técnica |
+| [`docs/methodology.md`](docs/methodology.md) | Metodologia experimental |
+| [`docs/results.md`](docs/results.md) | Resultados consolidados |
+| [`docs/sandbox-and-billing.md`](docs/sandbox-and-billing.md) | Sandbox, consumo e faturamento |
+| [`docs/incidents-and-recovery.md`](docs/incidents-and-recovery.md) | Incidentes e recuperação |
+| [`docs/use-cases.md`](docs/use-cases.md) | Casos de uso e aplicabilidade |
+| [`docs/adaptation-guide.md`](docs/adaptation-guide.md) | Guia de adaptação |
+| [`SECURITY.md`](SECURITY.md) | Política de segurança |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Critérios de contribuição |
+| [`CHANGELOG.md`](CHANGELOG.md) | Histórico de alterações |
 
-- volumes;
-- taxas;
-- status;
-- produtividade;
-- tendências;
-- agrupamentos;
-- resultados por período.
+### Templates disponíveis
 
-## 6. Publicação controlada
+- [Checklist de implementação](templates/implementation-checklist.md)
+- [Relatório de incidente](templates/incident-report.md)
+- [Revisão de privacidade](templates/privacy-review.md)
+- [Avaliação de riscos](templates/risk-assessment.md)
+- [Plano de testes](templates/test-plan.md)
 
-**Classificação:** Validado
+---
 
-Publicação condicionada a:
+## Aplicabilidade
 
-- esquema correto;
-- contagens aprovadas;
-- assinaturas válidas;
-- sanitização;
-- preservação da versão anterior.
+### Comprovado no experimento
 
-## 7. Avaliação de migração
-
-**Classificação:** Validado
-
-Aplicável para:
-
-- inventariar fórmulas;
-- identificar erros;
-- localizar gargalos;
-- medir latência;
-- avaliar complexidade;
-- apoiar decisão de migração.
-
-## 8. Consolidação de múltiplas planilhas
-
-**Classificação:** Adaptável
-
-Possíveis aplicações:
-
-- consolidação por unidade;
-- reunião de arquivos mensais;
-- padronização de departamentos;
-- centralização de resultados;
-- uniformização de estruturas.
-
-## 9. Conferência financeira
-
-**Classificação:** Adaptável
-
-Possíveis aplicações:
-
-- conciliação;
-- divergência de valores;
-- validação de repasses;
-- conferência entre períodos;
-- detecção de lançamentos ausentes.
-
-## 10. Estoque e movimentação
-
-**Classificação:** Adaptável
-
-Possíveis aplicações:
-
-- comparação entre estoque esperado e realizado;
+- externalização de fórmulas e regras;
+- processamento em lote;
+- qualidade de dados;
 - identificação de divergências;
-- consolidação entre unidades;
-- detecção de movimentações atípicas.
+- identificação de exceções;
+- indicadores periódicos;
+- comparação entre gerações;
+- publicação controlada;
+- auditoria;
+- recuperação;
+- monitoramento somente leitura;
+- avaliação de migração.
 
-## 11. Campanhas e produtividade
+### Compatível, mas não testado diretamente
 
-**Classificação:** Adaptável
+- consolidação de múltiplas planilhas;
+- indicadores comerciais;
+- reconciliação entre bases;
+- homologação de regras;
+- apuração periódica;
+- preparação de dados para dashboards;
+- monitoramento de qualidade;
+- comparação entre unidades ou períodos.
 
-Possíveis aplicações:
-
-- consolidação de resultados;
-- validação de metas;
-- acompanhamento por equipe;
-- preparação de indicadores;
-- identificação de exceções.
-
-## 12. Preparação de dados para dashboards
-
-**Classificação:** Adaptável
-
-Possibilidades:
-
-- pré-calcular indicadores;
-- materializar resultados;
-- reduzir fórmulas;
-- validar dados antes da visualização.
-
-## 13. Processamento em tempo real
-
-**Classificação:** Revisão necessária
-
-O pipeline validado é orientado a lotes e gatilhos periódicos.
-
-Ele não deve ser apresentado como solução pronta para:
-
-- banco transacional;
-- gravações concorrentes;
-- resposta em tempo real;
-- eventos contínuos;
-- aplicações críticas de baixa latência.
+Os casos de uso estão detalhados em [`docs/use-cases.md`](docs/use-cases.md).
 
 ---
 
-# Quando não utilizar
+## Limitações
 
-Esta abordagem não deve ser adotada sem revisão para:
+A prova de conceito não comprovou:
 
-- aplicações transacionais;
-- operações em tempo real;
-- edição simultânea de registros;
-- sistemas com baixa tolerância a atraso;
-- retenção permanente no sandbox;
-- grandes volumes sem estimativa de custo;
-- dados sensíveis sem governança;
-- processos críticos sem monitoramento;
-- cenários que dependam exclusivamente das cotas gratuitas.
+- processamento transacional;
+- tempo real;
+- streaming;
+- milhares de usuários simultâneos;
+- disaster recovery completo;
+- disponibilidade contínua;
+- retenção permanente no Sandbox;
+- adequação jurídica ou regulatória;
+- operação crítica sem monitoramento;
+- escalabilidade irrestrita;
+- substituição automática de um backend dedicado.
 
-Nesses casos, devem ser avaliados:
-
-- banco transacional;
-- backend dedicado;
-- filas;
-- APIs;
-- armazenamento permanente;
-- faturamento;
-- monitoramento;
-- segurança;
-- recuperação.
+O BigQuery Sandbox também possui limites de armazenamento, retenção e recursos. Habilitar faturamento amplia as possibilidades do BigQuery, mas não elimina gargalos inerentes à leitura e à escrita em planilhas.
 
 ---
 
-# Segurança e privacidade
+## Segurança e privacidade
 
-O conteúdo público deve utilizar exclusivamente:
+O conteúdo do repositório utiliza:
 
 - dados sintéticos;
 - nomes genéricos;
-- configurações fictícias;
-- métricas arredondadas;
-- diagramas abstratos;
-- exemplos reescritos.
+- configurações de exemplo;
+- métricas agregadas;
+- evidências sanitizadas;
+- diagramas abstratos.
 
-## Conteúdo proibido
-
-Não devem ser publicados:
+Não devem ser adicionados:
 
 - dados reais;
-- nomes de pessoas;
-- CNPJs;
-- e-mails;
-- IDs de planilhas;
-- IDs de projetos;
+- dados pessoais;
+- nomes de clientes;
+- identificadores de planilhas reais;
+- identificadores de projetos operacionais;
 - datasets reais;
 - tokens;
 - chaves;
@@ -844,47 +560,46 @@ Não devem ser publicados:
 - propriedades de script;
 - identificadores de gatilhos;
 - backups;
-- dumps;
-- código de produtos internos.
+- dumps de ambientes reais.
 
 > [!CAUTION]
-> Dados sensíveis nunca devem ser enviados ao Git com a intenção de removê-los depois. O histórico pode preservar o conteúdo mesmo após a exclusão do arquivo.
+> Dados sensíveis não devem ser enviados ao Git com a intenção de removê-los posteriormente. O histórico pode preservar o conteúdo mesmo depois da exclusão do arquivo.
+
+Problemas de segurança devem seguir as orientações de [`SECURITY.md`](SECURITY.md).
 
 ---
 
-# Conclusões
+## Conclusão
 
 O estudo demonstrou que:
 
-1. o processamento pode ser retirado das fórmulas;
-2. a planilha de origem pode permanecer somente para leitura;
+1. cálculos e regras podem ser retirados das fórmulas;
+2. a origem pode permanecer somente para leitura;
 3. o BigQuery pode executar limpeza, regras e agregações;
-4. Apps Script pode coordenar um pipeline por estados;
-5. publicações podem ser condicionadas a validações;
+4. o Apps Script pode coordenar um pipeline por estados;
+5. publicações podem depender de validações;
 6. resultados podem ser auditados;
-7. incidentes podem ser recuperados;
-8. recursos temporários podem ser identificados e removidos;
-9. saídas podem ser publicadas sem fórmulas;
-10. o sandbox foi suficiente para o volume experimental.
+7. falhas podem ser preservadas;
+8. incidentes podem ser recuperados;
+9. saídas técnicas podem ser publicadas sem fórmulas;
+10. o BigQuery Sandbox foi suficiente para o volume experimental.
 
 Também demonstrou que:
 
-- o Google Sheets continuou sendo o principal gargalo de publicação;
-- o sandbox possui limitações de retenção e recursos;
-- faturamento amplia o BigQuery, mas não corrige problemas da interface baseada em planilha;
-- estruturas dinâmicas exigem auditorias semanticamente corretas;
-- produção crítica exige análise arquitetural adicional.
+- o Google Sheets permaneceu como principal gargalo de publicação;
+- o Sandbox não é uma solução automática de retenção permanente;
+- conteúdo dinâmico exige validações semanticamente corretas;
+- faturamento amplia recursos, mas não resolve problemas estruturais da planilha;
+- produção crítica exige avaliação arquitetural adicional.
 
-## Síntese
-
-> **O principal resultado não foi apenas processar dados no BigQuery. Foi comprovar que regras, validações, auditoria e recuperação podem ser desacopladas das fórmulas e organizadas como um pipeline controlado.**
+> **O resultado principal não foi apenas processar dados no BigQuery. Foi comprovar que regras, validações, auditoria e recuperação podem ser desacopladas das fórmulas e organizadas como um pipeline controlado.**
 
 ---
 
-# Referências
+## Referências
 
-- [BigQuery Sandbox — documentação oficial](https://docs.cloud.google.com/bigquery/docs/sandbox)
-- [BigQuery Pricing — documentação oficial](https://cloud.google.com/bigquery/pricing)
+- [BigQuery Sandbox](https://docs.cloud.google.com/bigquery/docs/sandbox)
+- [BigQuery Pricing](https://cloud.google.com/bigquery/pricing)
 - [BigQuery Quotas and Limits](https://docs.cloud.google.com/bigquery/quotas)
 - [Apps Script Quotas](https://developers.google.com/apps-script/guides/services/quotas)
 - [Apps Script Logging](https://developers.google.com/apps-script/guides/logging)
@@ -892,26 +607,18 @@ Também demonstrou que:
 
 ---
 
-# Licença
+## Licença
 
-A licença deste repositório ainda está em avaliação.
+Este repositório é disponibilizado sob a **Apache License 2.0**.
 
-Enquanto não houver uma licença explícita:
-
-- o repositório não deve ser considerado open source;
-- não existe autorização automática para copiar, modificar ou distribuir seu conteúdo;
-- contribuições externas não estão abertas.
-
-A licença deverá ser definida antes da publicação definitiva.
+Consulte o arquivo [`LICENSE`](LICENSE) para conhecer os termos aplicáveis ao uso, modificação e distribuição.
 
 ---
 
 <div align="center">
 
-### Estudo de engenharia, governança e modernização de processos baseados em planilhas
+### Engenharia, governança e modernização de processos baseados em planilhas
 
-**Dados sintéticos • Métricas anonimizadas • Nenhuma credencial**
+**Dados sintéticos · Evidências sanitizadas · Nenhuma credencial**
 
 </div>
-```
-
