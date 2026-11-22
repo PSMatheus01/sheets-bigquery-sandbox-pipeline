@@ -1,0 +1,334 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "formula_baseline_summary",
+  "language": "pt-BR",
+  "title": "Resumo sanitizado da baseline de fórmulas",
+  "description": "Consolidado estruturado do monitoramento somente leitura e do inventário de fórmulas da planilha operacional avaliada.",
+  "sanitization": {
+    "sanitized": true,
+    "contains_production_records": false,
+    "contains_cell_contents": false,
+    "contains_complete_formulas": false,
+    "contains_personal_data": false,
+    "contains_credentials": false,
+    "contains_spreadsheet_ids": false,
+    "contains_sheet_ids": false,
+    "contains_project_ids": false,
+    "contains_deployment_ids": false,
+    "contains_trigger_ids": false,
+    "contains_user_keys": false,
+    "contains_operational_hashes": false,
+    "contains_raw_logs": false
+  },
+  "monitoring": {
+    "environment": "production_read_only",
+    "execution_project": "shadow",
+    "source_type": "Google Sheets",
+    "target_description": "Planilha operacional com fórmulas",
+    "target_tab_description": "Aba operacional principal",
+    "start_at": "2026-11-13T10:52:33-03:00",
+    "configured_end_at": "2026-11-14T10:52:33-03:00",
+    "effective_end_at": "2026-11-14T10:54:00-03:00",
+    "configured_duration_hours": 24,
+    "configured_interval_minutes": 15,
+    "closure_reason": "automatic_expiration",
+    "closed_automatically": true,
+    "manual_intervention_required": false,
+    "included_non_working_period": true,
+    "operational_load_representation": "partial"
+  },
+  "coverage": {
+    "expected_samples": 96,
+    "completed_samples": 96,
+    "coverage_percentage": 100.0,
+    "successful_executions": 96,
+    "failed_executions": 0,
+    "active_at_end": false,
+    "closed_at_end": true,
+    "triggers_expected": 1,
+    "triggers_removed_at_end": 1,
+    "triggers_remaining_at_end": 0
+  },
+  "inventory": {
+    "completed": true,
+    "rows": 75595,
+    "columns": 35,
+    "cells": 2645825,
+    "formulas": 146701,
+    "formula_density_ratio": 0.05545,
+    "formula_density_percentage": 5.545,
+    "columns_with_formulas": 5,
+    "cells_with_errors": 18
+  },
+  "formula_distribution": [
+    {
+      "column": "A",
+      "formula_count": 1,
+      "error_count": 0,
+      "mixed_formula_patterns": false
+    },
+    {
+      "column": "R",
+      "formula_count": 1454,
+      "error_count": 0,
+      "mixed_formula_patterns": false
+    },
+    {
+      "column": "S",
+      "formula_count": 5129,
+      "error_count": 13,
+      "mixed_formula_patterns": false
+    },
+    {
+      "column": "AB",
+      "formula_count": 75594,
+      "error_count": 2,
+      "mixed_formula_patterns": true
+    },
+    {
+      "column": "AG",
+      "formula_count": 64523,
+      "error_count": 0,
+      "mixed_formula_patterns": false
+    }
+  ],
+  "errors_outside_formula_distribution": [
+    {
+      "column": "E",
+      "error_count": 3
+    }
+  ],
+  "formula_functions": {
+    "interpretation": "Uma célula pode conter várias funções, portanto a soma das ocorrências pode ser maior que a quantidade total de fórmulas.",
+    "functions": [
+      {
+        "name": "IF",
+        "occurrences": 173158
+      },
+      {
+        "name": "SUBSTITUTE",
+        "occurrences": 151188
+      },
+      {
+        "name": "VALUE",
+        "occurrences": 75594
+      },
+      {
+        "name": "XLOOKUP",
+        "occurrences": 64523
+      },
+      {
+        "name": "COUNTIFS",
+        "occurrences": 5129
+      },
+      {
+        "name": "IMPORTRANGE",
+        "occurrences": 1
+      }
+    ]
+  },
+  "formula_errors": {
+    "total": 18,
+    "types": [
+      {
+        "type": "#REF!",
+        "count": 8
+      },
+      {
+        "type": "#VALUE!",
+        "count": 4
+      },
+      {
+        "type": "#ERROR!",
+        "count": 6
+      }
+    ],
+    "interpretation": "Os erros foram encontrados pelo inventário integral. A ausência de erros nas regiões amostradas não elimina os erros localizados fora dessas regiões."
+  },
+  "periodic_sample": {
+    "rows_per_sample": 800,
+    "columns_per_sample": 35,
+    "cells_per_sample": 28000,
+    "formulas_per_sample": 2499,
+    "errors_per_sample_in_selected_regions": 0,
+    "regions": [
+      {
+        "name": "top",
+        "start_row": 1,
+        "end_row": 100,
+        "row_count": 100
+      },
+      {
+        "name": "middle",
+        "start_row": 37698,
+        "end_row": 37897,
+        "row_count": 200
+      },
+      {
+        "name": "bottom",
+        "start_row": 75096,
+        "end_row": 75595,
+        "row_count": 500
+      }
+    ],
+    "sampled_formula_distribution": [
+      {
+        "column": "R",
+        "formula_count": 500
+      },
+      {
+        "column": "S",
+        "formula_count": 500
+      },
+      {
+        "column": "AB",
+        "formula_count": 799
+      },
+      {
+        "column": "AG",
+        "formula_count": 700
+      }
+    ]
+  },
+  "source_activity": {
+    "modified_time_changes": 31,
+    "last_observed_operational_change_at": "2026-11-13T18:36:46-03:00",
+    "interpretation": "Alterações de modifiedTime indicam mudanças no arquivo, mas não identificam isoladamente quais células foram alteradas ou quanto tempo o recálculo interno levou."
+  },
+  "performance": {
+    "opening": {
+      "average_milliseconds": 6098.96,
+      "median_milliseconds": 10674.5,
+      "p95_milliseconds": 10979.75,
+      "maximum_milliseconds": 13890
+    },
+    "sample_reading": {
+      "average_milliseconds": 3115.41,
+      "p95_milliseconds": 5590,
+      "maximum_milliseconds": 9430
+    },
+    "sample_processing": {
+      "average_milliseconds": 4031.23,
+      "p95_milliseconds": 7530,
+      "maximum_milliseconds": 11110
+    },
+    "exact_google_sheets_recalculation_time_available": false,
+    "exact_user_experience_latency_available": false,
+    "exact_concurrent_user_impact_available": false
+  },
+  "security": {
+    "production_read_only": true,
+    "production_cells_modified": false,
+    "production_formulas_modified": false,
+    "production_rows_inserted": false,
+    "production_rows_deleted": false,
+    "production_tabs_created": false,
+    "production_tabs_deleted": false,
+    "production_formatting_modified": false,
+    "production_permissions_modified": false,
+    "production_trigger_created": false,
+    "bigquery_executed": false,
+    "experimental_pipeline_state_modified": false,
+    "spreadsheet_flush_executed": false,
+    "metrics_stored_outside_production": true,
+    "temporary_trigger_removed_at_end": true
+  },
+  "privacy": {
+    "stored_metrics_only": true,
+    "stored_aggregates_only": true,
+    "stored_cell_values": false,
+    "stored_complete_formulas": false,
+    "stored_names": false,
+    "stored_emails": false,
+    "stored_documents": false,
+    "stored_phone_numbers": false,
+    "stored_customer_records": false
+  },
+  "findings": [
+    {
+      "id": "F-01",
+      "statement": "A estrutura avaliada continha 146.701 fórmulas.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "F-02",
+      "statement": "As fórmulas estavam concentradas em cinco colunas.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "F-03",
+      "statement": "A coluna AB possuía fórmula em praticamente todas as linhas e apresentava padrões misturados.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "F-04",
+      "statement": "O inventário integral encontrou 18 células com erro.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "F-05",
+      "statement": "O monitoramento foi concluído com 100% das amostras previstas.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "F-06",
+      "statement": "O monitoramento modificou a planilha de produção.",
+      "evidence_level": "E1",
+      "supported": false
+    },
+    {
+      "id": "F-07",
+      "statement": "A ausência de erros nas regiões amostradas significa que a planilha não continha erros.",
+      "evidence_level": "E1",
+      "supported": false
+    },
+    {
+      "id": "F-08",
+      "statement": "Os dados permitem calcular o tempo interno exato de recálculo do Google Sheets.",
+      "evidence_level": "E4",
+      "supported": false
+    },
+    {
+      "id": "F-09",
+      "statement": "Os dados permitem declarar um ganho percentual exato em relação ao pipeline externo.",
+      "evidence_level": "E4",
+      "supported": false
+    }
+  ],
+  "interpretation": {
+    "formula_dependency_relevant": true,
+    "formula_logic_concentrated": true,
+    "mixed_patterns_detected": true,
+    "formula_errors_detected": true,
+    "monitoring_collection_failures_detected": false,
+    "production_interference_detected": false,
+    "exact_speed_improvement_calculable": false,
+    "baseline_sufficient_for_structural_assessment": true,
+    "baseline_sufficient_for_exact_recalculation_benchmark": false
+  },
+  "limitations": [
+    "A janela incluiu parte de um período sem expediente.",
+    "A carga operacional observada não representa necessariamente o maior volume de usuários.",
+    "O Apps Script não expõe o tempo interno completo de recálculo do Google Sheets.",
+    "As regiões periódicas representavam uma amostra fixa de 800 linhas.",
+    "O inventário integral identificou estrutura e erros, mas não avaliou semanticamente cada regra.",
+    "Mudanças de modifiedTime não identificam quais células foram alteradas.",
+    "O experimento não mediu a experiência individual de todos os usuários.",
+    "O experimento não avaliou 100 usuários simultâneos.",
+    "Os resultados pertencem à estrutura e ao período avaliados."
+  ],
+  "related_documents": [
+    "README.md",
+    "docs/methodology.md",
+    "docs/results.md",
+    "docs/use-cases.md",
+    "docs/adaptation-guide.md",
+    "evidence/test-matrix.md",
+    "evidence/experimental-summary.json"
+  ]
+}
