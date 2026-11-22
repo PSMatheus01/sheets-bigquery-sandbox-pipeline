@@ -1,3 +1,5 @@
+![Capa do repositório sheets-bigquery-sandbox-pipeline, representando origem somente leitura, orquestração por Apps Script, processamento em camadas no BigQuery Sandbox, auditoria e recuperação controlada.](assets/cover/repository-cover.png)
+
 <div align="center">
 
 # Google Sheets to BigQuery Sandbox Pipeline
@@ -911,3 +913,5 @@ A licença deverá ser definida antes da publicação definitiva.
 **Dados sintéticos • Métricas anonimizadas • Nenhuma credencial**
 
 </div>
+```
+
