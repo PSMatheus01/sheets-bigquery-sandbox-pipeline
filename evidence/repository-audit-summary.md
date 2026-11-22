@@ -310,24 +310,21 @@ A ressalva foi classificada como:
 - sem impacto na segurança;
 - sem impacto nos exemplos.
 
-### 13.3 Tratamento recomendado
+### 13.3 Decisão registrada
 
-Reexportar ou comprimir a imagem mantendo:
+A ressalva foi analisada e formalmente aceita.
 
-- o mesmo nome;
-- o mesmo caminho;
-- a proporção 2:1;
-- a legibilidade;
-- o formato PNG;
-- o vínculo existente no README.
+A capa será mantida com 5,56 MiB porque:
 
-Tamanho preferencial:
+- a qualidade visual foi considerada adequada;
+- o arquivo possui assinatura PNG válida;
+- não existe impacto na segurança;
+- não existe impacto na integridade;
+- não existe erro de renderização;
+- o impacto está restrito ao carregamento do README;
+- a otimização foi considerada opcional pelo responsável pelo repositório.
 
-- entre 500 KiB e 1,5 MiB.
-
-Limite para remoção da ressalva automatizada:
-
-- abaixo de 5 MiB.
+A ressalva continuará visível no workflow para preservar a transparência da auditoria.
 
 ---
 
@@ -440,9 +437,9 @@ A auditoria possui as seguintes limitações:
 
 `1`
 
-### 17.5 Ressalva pendente
+### 17.5 Ressalva aceita
 
-O tamanho da capa excede 5 MiB.
+O tamanho da capa excede 5 MiB. A ressalva foi analisada e formalmente aceita pelo responsável pelo repositório.
 
 ### 17.6 Decisão
 
@@ -460,7 +457,7 @@ O repositório foi considerado:
 
 Antes de alterar a visibilidade para pública, deverão ser confirmados:
 
-- [ ] capa otimizada ou ressalva formalmente aceita;
+- [x] capa otimizada ou ressalva formalmente aceita;
 - [ ] workflow final aprovado;
 - [ ] scan completo do histórico aprovado;
 - [ ] README renderizado corretamente;
