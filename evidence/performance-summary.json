@@ -1,0 +1,383 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "performance_and_consumption_summary",
+  "language": "pt-BR",
+  "title": "Resumo sanitizado de performance e consumo",
+  "description": "Consolidado estruturado das métricas de performance, consumo, publicação, auditoria e baseline observadas nos experimentos.",
+  "sanitization": {
+    "sanitized": true,
+    "contains_production_records": false,
+    "contains_personal_data": false,
+    "contains_credentials": false,
+    "contains_spreadsheet_ids": false,
+    "contains_project_ids": false,
+    "contains_deployment_ids": false,
+    "contains_trigger_ids": false,
+    "contains_user_keys": false,
+    "contains_operational_hashes": false,
+    "contains_raw_logs": false
+  },
+  "measurement_scope": {
+    "pipeline_window_hours": 48,
+    "formula_baseline_window_hours": 24,
+    "pipeline_performance_samples": 30,
+    "formula_baseline_samples": 96,
+    "pipeline_completed_cycles": 10,
+    "pipeline_approved_cycles": 10,
+    "production_read_only": true,
+    "billing_enabled": false
+  },
+  "metric_definitions": {
+    "average": "Soma das durações dividida pela quantidade de amostras.",
+    "median": "Valor central das amostras ordenadas.",
+    "p95": "Valor abaixo do qual se encontram aproximadamente 95% das amostras.",
+    "maximum": "Maior duração observada no conjunto.",
+    "bytes_processed": "Quantidade de dados analisada pela execução do BigQuery.",
+    "billable_bytes_metric": "Quantidade considerada pela métrica de contabilização do BigQuery.",
+    "projection": "Estimativa calculada a partir de uma amostra de referência, não equivalente a consumo medido."
+  },
+  "pipeline_performance": {
+    "samples": 30,
+    "average_milliseconds": 12715.33,
+    "median_milliseconds": 2269,
+    "p95_milliseconds": 62315.15,
+    "minimum_milliseconds": 304,
+    "maximum_milliseconds": 92083,
+    "reference_target_milliseconds": 25000,
+    "samples_below_reference_target": 26,
+    "samples_above_reference_target": 4,
+    "percentage_below_reference_target": 86.67,
+    "percentage_above_reference_target": 13.33,
+    "assessment": "approved_with_reservations"
+  },
+  "slowest_persisted_operations": [
+    {
+      "rank": 1,
+      "operation": "publication_recovery_reference",
+      "duration_milliseconds": 92083,
+      "exceeded_reference_target": true
+    },
+    {
+      "rank": 2,
+      "operation": "shadow_publication",
+      "duration_milliseconds": 87404,
+      "exceeded_reference_target": true
+    },
+    {
+      "rank": 3,
+      "operation": "optimized_capture",
+      "duration_milliseconds": 31651,
+      "exceeded_reference_target": true
+    },
+    {
+      "rank": 4,
+      "operation": "native_promotion",
+      "duration_milliseconds": 31001,
+      "exceeded_reference_target": true
+    },
+    {
+      "rank": 5,
+      "operation": "post_promotion_validation",
+      "duration_milliseconds": 22082,
+      "exceeded_reference_target": false
+    }
+  ],
+  "publication_performance": {
+    "persisted_reference_cycle": {
+      "published_rows": 9009,
+      "published_cells": 114575,
+      "technical_formulas": 0,
+      "sanitized_values": 2340,
+      "duration_milliseconds": 87404
+    },
+    "final_window_cloud_log_observation": {
+      "stage_duration_milliseconds": 87841,
+      "executor_total_duration_milliseconds": 90713,
+      "executor_overhead_milliseconds": 2872
+    },
+    "cloud_logging_observations": {
+      "samples": 7,
+      "durations_milliseconds": [
+        64864,
+        46486,
+        113320,
+        89489,
+        44927,
+        20554,
+        65140
+      ],
+      "average_milliseconds": 63540,
+      "median_milliseconds": 64864,
+      "minimum_milliseconds": 20554,
+      "maximum_milliseconds": 113320,
+      "failed_publications": 0
+    },
+    "accumulated_publication": {
+      "published_rows": 30904,
+      "published_cells": 440653
+    },
+    "assessment": "main_observed_bottleneck",
+    "interpretation": "A publicação no Google Sheets apresentou maior duração que o processamento analítico do ciclo de referência."
+  },
+  "final_sequence_performance": {
+    "publication": {
+      "duration_milliseconds": 87841,
+      "status": "approved_with_reservation"
+    },
+    "publication_validation": {
+      "duration_milliseconds": 6468,
+      "status": "approved"
+    },
+    "cycle_finalization": {
+      "duration_milliseconds": 729,
+      "status": "approved_with_reservation"
+    },
+    "window_closure": {
+      "configured_end_at": "2026-11-10T19:25:47.286-03:00",
+      "effective_closure_at": "2026-11-10T19:29:03.841-03:00",
+      "closure_delay_milliseconds": 196555,
+      "closure_delay_seconds": 196.555,
+      "closure_delay_minutes_approx": 3.276,
+      "reason": "automatic_expiration",
+      "manual_intervention_required": false
+    }
+  },
+  "audit_performance": {
+    "audits_registered_in_final_consolidation": 1,
+    "approved_audits": 1,
+    "reference_duration_milliseconds": 13556,
+    "final_verdict": "INTEGRIDADE APROVADA",
+    "production_modified": false,
+    "bigquery_objects_modified_during_audit": false,
+    "blocking_residual_objects_found": false
+  },
+  "bigquery_reference_cycle": {
+    "total_jobs": 13,
+    "jobs_with_processing": 9,
+    "jobs_without_processing": 4,
+    "bytes_processed": 88789912,
+    "processed_mebibytes_approx": 84.68,
+    "billable_bytes_metric": 181403648,
+    "billable_mebibytes_approx": 173.0,
+    "approximate_percentage_of_one_tib": 0.0165,
+    "billing_enabled": false,
+    "financial_charge_observed": false,
+    "within_sandbox_monthly_query_quota": true
+  },
+  "bigquery_aggregation_control": {
+    "bigquery_metric_occurrences_in_consolidated_results": 47,
+    "occurrences_summed": false,
+    "reason": "As ocorrências poderiam representar métricas repetidas do mesmo ciclo ou da mesma consulta em resultados diferentes.",
+    "reference_cycle_used_instead": true,
+    "duplicate_counting_avoided": true
+  },
+  "bigquery_projections": {
+    "projection_basis": {
+      "reference_billable_bytes_per_cycle": 181403648,
+      "projection_is_measured_consumption": false
+    },
+    "window_projections": [
+      {
+        "period_hours": 48,
+        "projected_bytes": 4907335680,
+        "projected_gibibytes_approx": 4.57,
+        "measured_total": false
+      },
+      {
+        "period_hours": 72,
+        "projected_bytes": 7361003520,
+        "projected_gibibytes_approx": 6.86,
+        "measured_total": false
+      }
+    ],
+    "monthly_scenarios": [
+      {
+        "scenario": "one_complete_cycle_per_day",
+        "assumed_days": 30,
+        "assumed_complete_cycles_per_day": 1,
+        "projected_cycles_per_month": 30,
+        "projected_bytes_per_month": 5442109440,
+        "projected_gibibytes_per_month_approx": 5.07,
+        "measured_total": false
+      },
+      {
+        "scenario": "ninety_six_complete_cycles_per_day",
+        "assumed_days": 30,
+        "assumed_complete_cycles_per_day": 96,
+        "projected_cycles_per_month": 2880,
+        "projected_bytes_per_month": 522442506240,
+        "projected_gibibytes_per_month_approx": 486.56,
+        "measured_total": false,
+        "interpretation": "Cenário teórico extremo que não corresponde ao comportamento real do executor, pois uma chamada de gatilho não representa necessariamente um ciclo completo."
+      }
+    ]
+  },
+  "apps_script_runtime_budget": {
+    "configured_daily_budget_minutes": 70,
+    "preventive_reserve_minutes": 5,
+    "reference_final_day": {
+      "consumed_minutes": 10.18785,
+      "usage_percentage": 14.55,
+      "remaining_minutes": 59.81215
+    },
+    "highest_observed_day": {
+      "consumed_minutes": 13.36,
+      "usage_percentage": 19.09,
+      "remaining_minutes": 56.64
+    },
+    "budget_exceeded": false,
+    "preventive_reserve_compromised": false
+  },
+  "formula_baseline_performance": {
+    "samples": 96,
+    "successful_samples": 96,
+    "failed_samples": 0,
+    "coverage_percentage": 100.0,
+    "sample_shape": {
+      "rows": 800,
+      "columns": 35,
+      "cells": 28000,
+      "formulas": 2499
+    },
+    "opening": {
+      "average_milliseconds": 6098.96,
+      "median_milliseconds": 10674.5,
+      "p95_milliseconds": 10979.75,
+      "maximum_milliseconds": 13890
+    },
+    "sample_reading": {
+      "average_milliseconds": 3115.41,
+      "p95_milliseconds": 5590,
+      "maximum_milliseconds": 9430
+    },
+    "sample_processing": {
+      "average_milliseconds": 4031.23,
+      "p95_milliseconds": 7530,
+      "maximum_milliseconds": 11110
+    }
+  },
+  "formula_baseline_scale": {
+    "rows": 75595,
+    "columns": 35,
+    "cells": 2645825,
+    "formulas": 146701,
+    "formula_density_percentage": 5.545,
+    "formula_errors": 18,
+    "modified_time_changes": 31
+  },
+  "comparison": {
+    "pipeline_external_processing_validated": true,
+    "formula_baseline_completed": true,
+    "exact_google_sheets_recalculation_time_available": false,
+    "exact_user_perceived_latency_available": false,
+    "exact_speed_improvement_percentage_calculable": false,
+    "bigquery_was_main_bottleneck": false,
+    "google_sheets_publication_was_main_bottleneck": true,
+    "billing_would_automatically_remove_publication_bottleneck": false,
+    "architecture_control_improvement_supported": true,
+    "exact_performance_gain_supported": false
+  },
+  "bottlenecks": [
+    {
+      "rank": 1,
+      "component": "Google Sheets publication",
+      "evidence": "Publicações entre 20.554 e 113.320 milissegundos nas observações do Cloud Logging.",
+      "classification": "confirmed"
+    },
+    {
+      "rank": 2,
+      "component": "Capture",
+      "evidence": "Duração de referência de 31.651 milissegundos.",
+      "classification": "confirmed"
+    },
+    {
+      "rank": 3,
+      "component": "Native promotion",
+      "evidence": "Duração de referência de 31.001 milissegundos.",
+      "classification": "confirmed"
+    },
+    {
+      "rank": 4,
+      "component": "Post-promotion validation",
+      "evidence": "Duração de referência de 22.082 milissegundos.",
+      "classification": "confirmed"
+    }
+  ],
+  "performance_findings": [
+    {
+      "id": "PF-01",
+      "statement": "A mediana do pipeline foi inferior à média.",
+      "supported": true,
+      "interpretation": "Uma pequena quantidade de etapas mais lentas elevou a média."
+    },
+    {
+      "id": "PF-02",
+      "statement": "86,67% das amostras do pipeline ficaram abaixo da referência genérica de 25 segundos.",
+      "supported": true
+    },
+    {
+      "id": "PF-03",
+      "statement": "A publicação no Google Sheets foi a etapa recorrente com maior duração observada.",
+      "supported": true
+    },
+    {
+      "id": "PF-04",
+      "statement": "O volume do BigQuery foi o principal fator limitante durante o experimento.",
+      "supported": false
+    },
+    {
+      "id": "PF-05",
+      "statement": "O runtime diário do Apps Script ultrapassou o orçamento configurado.",
+      "supported": false
+    },
+    {
+      "id": "PF-06",
+      "statement": "As projeções mensais representam consumo real medido.",
+      "supported": false
+    },
+    {
+      "id": "PF-07",
+      "statement": "Os resultados sustentam um percentual exato de ganho sobre o recálculo interno do Google Sheets.",
+      "supported": false
+    },
+    {
+      "id": "PF-08",
+      "statement": "A publicação sem fórmulas reduziu a necessidade de recálculo nas abas técnicas publicadas.",
+      "supported": true
+    }
+  ],
+  "limitations": [
+    "As 30 amostras de performance representam etapas diferentes e não transações homogêneas.",
+    "Uma referência única de 25 segundos não descreve adequadamente todos os tipos de etapa.",
+    "A janela do pipeline teve aproximadamente 48 horas.",
+    "A baseline de fórmulas teve aproximadamente 24 horas e incluiu período sem expediente.",
+    "O Google Sheets não expôs o tempo interno integral de recálculo.",
+    "A experiência individual dos usuários não foi medida.",
+    "Não foi executado teste com 100 usuários simultâneos.",
+    "As projeções mensais foram derivadas de um ciclo de referência.",
+    "As ocorrências de métricas do BigQuery não foram somadas para evitar dupla contagem.",
+    "Os resultados de performance pertencem ao volume e ao ambiente avaliados.",
+    "O experimento não avaliou streaming nem processamento transacional em tempo real."
+  ],
+  "assessment": {
+    "pipeline_functional_performance": "approved_with_reservations",
+    "bigquery_consumption": "approved",
+    "apps_script_runtime_budget": "approved",
+    "formula_baseline_collection": "approved",
+    "publication_performance": "bottleneck_identified",
+    "exact_speed_comparison": "not_supported",
+    "automatic_generalization": "not_supported"
+  },
+  "related_documents": [
+    "README.md",
+    "docs/methodology.md",
+    "docs/results.md",
+    "docs/sandbox-and-billing.md",
+    "docs/incidents-and-recovery.md",
+    "docs/use-cases.md",
+    "docs/adaptation-guide.md",
+    "evidence/test-matrix.md",
+    "evidence/experimental-summary.json",
+    "evidence/formula-baseline-summary.json"
+  ]
+}
