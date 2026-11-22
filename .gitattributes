@@ -1,0 +1,48 @@
+# Normalização automática de arquivos de texto
+* text=auto
+
+# Documentação
+*.md text eol=lf
+*.txt text eol=lf
+
+# Dados estruturados
+*.json text eol=lf
+*.csv text eol=lf
+
+# Código-fonte
+*.sql text eol=lf
+*.gs text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+
+# Configurações
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.properties text eol=lf
+*.env.example text eol=lf
+
+# Scripts
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Reconhecimento de linguagem no GitHub
+*.gs linguist-language=JavaScript
+*.sql linguist-language=SQL
+
+# Arquivos visuais e binários
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+
+# SVG permanece como texto para permitir revisão
+*.svg text eol=lf
