@@ -1,0 +1,5 @@
+team_code,team_name,group_code,active,daily_capacity_reference,valid_from,valid_to
+TEAM_A,Synthetic Team A,GROUP_1,TRUE,40,2026-01-01,
+TEAM_B,Synthetic Team B,GROUP_1,TRUE,35,2026-01-01,
+TEAM_C,Synthetic Team C,GROUP_2,TRUE,30,2026-01-01,
+TEAM_D,Synthetic Team D,GROUP_2,FALSE,25,2026-01-01,2026-10-31
