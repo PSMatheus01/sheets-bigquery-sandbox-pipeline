@@ -1,2 +1,2 @@
 indicator_level,event_date,team_code,team_name,group_code,channel,campaign,total_records,valid_records,divergence_records,converted_records,valid_converted_records,divergence_converted_records,conversion_rate_percentage,valid_conversion_rate_percentage,new_records,in_progress_records,completed_records,cancelled_records,total_attempts,average_attempts,total_estimated_value,missing_estimated_value_records,daily_capacity_reference,remaining_capacity_reference,capacity_exceeded,capacity_utilization_percentage
-OVERALL,,,,,,11,8,3,6,4,2,54.55,50.00,1,3,5,2,27,2.45,1535.00,1,,,,
+OVERALL,,,,,,,11,8,3,6,4,2,54.55,50.00,1,3,5,2,27,2.45,1535.00,1,,,,
