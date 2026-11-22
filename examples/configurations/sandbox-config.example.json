@@ -1,0 +1,342 @@
+{
+  "schema_version": "1.0.0",
+  "configuration_type": "sandbox_pipeline_example",
+  "description": "Configuração sintética para execução dos exemplos do pipeline no BigQuery Sandbox.",
+  "environment": {
+    "name": "sandbox_example",
+    "mode": "SANDBOX",
+    "billing_enabled": false,
+    "production_environment": false,
+    "production_writes_allowed": false,
+    "synthetic_data_only": true
+  },
+  "bigquery": {
+    "project_id": "your-sandbox-project-id",
+    "dataset_id": "sandbox_pipeline_example",
+    "location": "US",
+    "use_legacy_sql": false,
+    "maximum_bytes_billed_per_query": 104857600,
+    "labels": {
+      "environment": "sandbox",
+      "purpose": "synthetic_example",
+      "repository": "sheets_bigquery_sandbox_pipeline"
+    }
+  },
+  "storage": {
+    "native_retention_days": 59,
+    "expiration_alert_days": 7,
+    "permanent_tables_allowed": false,
+    "expiration_timestamp_expression": "TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 59 DAY)",
+    "automatic_cleanup_expected": true
+  },
+  "sources": {
+    "input": {
+      "type": "CSV",
+      "path": "../synthetic-data/input-example.csv",
+      "header_rows": 1,
+      "delimiter": ",",
+      "encoding": "UTF-8",
+      "expected_rows": 24,
+      "expected_columns": 12,
+      "all_raw_fields_as_string": true
+    },
+    "teams": {
+      "type": "CSV",
+      "path": "../synthetic-data/team-example.csv",
+      "header_rows": 1,
+      "delimiter": ",",
+      "encoding": "UTF-8",
+      "expected_rows": 4,
+      "expected_columns": 7,
+      "all_raw_fields_as_string": true
+    }
+  },
+  "raw_schemas": {
+    "input": [
+      {
+        "name": "source_row_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "record_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "event_date",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "team_code",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "agent_code",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "channel",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "campaign",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "status",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "attempts",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "converted",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "estimated_value",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "source_updated_at",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ],
+    "teams": [
+      {
+        "name": "team_code",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "team_name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "group_code",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "active",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "daily_capacity_reference",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "valid_from",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "valid_to",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "objects": {
+    "tables": {
+      "raw_input": "raw_input_example",
+      "raw_teams": "raw_team_example",
+      "clean_records": "clean_records_example",
+      "rules_records": "rules_records_example"
+    },
+    "views": {
+      "indicators": "vw_indicators_example",
+      "divergences": "vw_divergences_example",
+      "exceptions": "vw_exceptions_example",
+      "audit": "vw_audit_example"
+    }
+  },
+  "reference_window": {
+    "timezone": "UTC",
+    "start_date": "2026-11-01",
+    "end_date": "2026-11-30",
+    "end_date_inclusive": true
+  },
+  "domains": {
+    "allowed_statuses": [
+      "NEW",
+      "IN_PROGRESS",
+      "COMPLETED",
+      "CANCELLED"
+    ],
+    "allowed_channels": [
+      "WHATSAPP",
+      "WEB",
+      "PHONE",
+      "PARTNER"
+    ],
+    "allowed_campaigns": [
+      "CAMP_ALPHA",
+      "CAMP_BETA",
+      "CAMP_GAMMA"
+    ],
+    "accepted_boolean_true_values": [
+      "TRUE"
+    ],
+    "accepted_boolean_false_values": [
+      "FALSE"
+    ]
+  },
+  "validation": {
+    "required_fields": [
+      "source_row_id",
+      "record_id",
+      "event_date",
+      "team_code",
+      "agent_code",
+      "channel",
+      "campaign",
+      "status",
+      "attempts",
+      "converted",
+      "source_updated_at"
+    ],
+    "optional_fields": [
+      "estimated_value"
+    ],
+    "attempts_minimum": 0,
+    "estimated_value_minimum": 0,
+    "require_existing_team": true,
+    "require_active_team": true,
+    "require_team_valid_on_event_date": true,
+    "reject_unknown_status": true,
+    "reject_unknown_channel": true,
+    "reject_unknown_campaign": true,
+    "classify_out_of_window_records": true,
+    "block_on_invalid_raw_schema": true,
+    "block_on_empty_source": true
+  },
+  "deduplication": {
+    "enabled": true,
+    "business_key": [
+      "record_id"
+    ],
+    "order_by": [
+      {
+        "field": "source_updated_at",
+        "direction": "DESC"
+      },
+      {
+        "field": "source_row_id",
+        "direction": "DESC"
+      }
+    ],
+    "keep_rows_per_business_key": 1,
+    "preserve_duplicate_evidence": true
+  },
+  "business_rules": {
+    "completed_requires_converted_true": true,
+    "converted_true_requires_completed_status": true,
+    "cancelled_requires_converted_false": true,
+    "negative_attempts_are_invalid": true,
+    "negative_estimated_values_are_invalid": true,
+    "missing_estimated_value_is_allowed": true
+  },
+  "classification": {
+    "valid": "VALID",
+    "divergence": "DIVERGENCE",
+    "exception": "EXCEPTION",
+    "duplicate": "DUPLICATE",
+    "out_of_window": "OUT_OF_WINDOW"
+  },
+  "indicators": {
+    "group_by_fields": [
+      "event_date",
+      "team_code",
+      "group_code",
+      "channel",
+      "campaign"
+    ],
+    "metrics": [
+      "total_records",
+      "valid_records",
+      "converted_records",
+      "conversion_rate",
+      "total_attempts",
+      "average_attempts",
+      "total_estimated_value"
+    ],
+    "capacity_comparison_enabled": true
+  },
+  "audit": {
+    "enabled": true,
+    "validate_raw_count": true,
+    "validate_deduplicated_count": true,
+    "validate_classification_count": true,
+    "validate_duplicate_count": true,
+    "validate_exception_count": true,
+    "validate_divergence_count": true,
+    "validate_out_of_window_count": true,
+    "require_non_negative_counts": true,
+    "require_raw_decomposition": true
+  },
+  "orchestration": {
+    "automatic_execution_enabled": false,
+    "manual_execution_only": true,
+    "change_detection_enabled": false,
+    "trigger_creation_allowed": false,
+    "production_source_allowed": false,
+    "manual_authorization_required": true,
+    "manual_authorization_default": false
+  },
+  "publication": {
+    "enabled": false,
+    "destination_type": "NONE",
+    "spreadsheet_id": null,
+    "sheet_name": null,
+    "write_formulas": false,
+    "sanitize_formula_like_text": true
+  },
+  "runtime_budget": {
+    "daily_budget_minutes": 70,
+    "preventive_reserve_minutes": 5,
+    "stop_before_budget_exhaustion": true
+  },
+  "security": {
+    "allow_real_data": false,
+    "allow_production_identifiers": false,
+    "allow_embedded_credentials": false,
+    "allow_raw_log_export": false,
+    "allow_personal_data": false,
+    "require_synthetic_data": true,
+    "require_read_only_source": true,
+    "require_sanitized_logs": true
+  },
+  "expected_test_conditions": {
+    "unknown_team_present": true,
+    "inactive_team_present": true,
+    "missing_team_present": true,
+    "missing_agent_present": true,
+    "unknown_status_present": true,
+    "unknown_channel_present": true,
+    "invalid_boolean_present": true,
+    "invalid_integer_present": true,
+    "negative_attempts_present": true,
+    "negative_estimated_value_present": true,
+    "missing_estimated_value_present": true,
+    "missing_event_date_present": true,
+    "out_of_window_date_present": true,
+    "duplicate_business_key_present": true,
+    "business_rule_divergences_present": true
+  }
+}
