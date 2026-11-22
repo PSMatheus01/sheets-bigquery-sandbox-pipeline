@@ -1,0 +1,409 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "experimental_pipeline_summary",
+  "language": "pt-BR",
+  "title": "Resumo sanitizado do pipeline experimental",
+  "description": "Consolidado estruturado da execução controlada do pipeline com BigQuery Sandbox, Apps Script e publicação em ambiente shadow.",
+  "sanitization": {
+    "sanitized": true,
+    "contains_production_records": false,
+    "contains_personal_data": false,
+    "contains_credentials": false,
+    "contains_spreadsheet_ids": false,
+    "contains_project_ids": false,
+    "contains_deployment_ids": false,
+    "contains_trigger_ids": false,
+    "contains_user_keys": false,
+    "contains_operational_hashes": false,
+    "contains_raw_logs": false
+  },
+  "experiment": {
+    "environment": "sandbox_shadow",
+    "platform": {
+      "analytics": "BigQuery Sandbox",
+      "orchestration": "Google Apps Script",
+      "source": "Google Sheets em modo somente leitura",
+      "destination": "Google Sheets shadow"
+    },
+    "billing_enabled": false,
+    "production_read_only": true,
+    "start_at": "2026-11-08T19:25:47.286-03:00",
+    "configured_end_at": "2026-11-10T19:25:47.286-03:00",
+    "effective_end_at": "2026-11-10T19:29:03.841-03:00",
+    "configured_duration_hours": 48,
+    "closure_delay_seconds": 196.555,
+    "closure_reason": "automatic_expiration",
+    "closure_intervention": "none"
+  },
+  "objectives": [
+    "Validar processamento recorrente em ambiente sem faturamento.",
+    "Manter a origem de produção estritamente somente leitura.",
+    "Validar geração candidata antes da promoção.",
+    "Publicar valores processados sem fórmulas nas abas técnicas.",
+    "Validar interrupção segura diante de inconsistências.",
+    "Validar recuperação controlada do mesmo ciclo.",
+    "Executar auditoria de integridade.",
+    "Encerrar automaticamente a janela e remover o gatilho."
+  ],
+  "execution": {
+    "completed_cycles": 10,
+    "approved_cycles": 10,
+    "accumulated_results": 32,
+    "directly_approved_results": 31,
+    "historical_blocked_results": 1,
+    "active_blocks_at_end": 0,
+    "unhandled_failures_at_end": 0,
+    "final_state": "CICLO_CONCLUIDO",
+    "final_cycle_approved": true,
+    "final_status": "RESSALVA",
+    "final_state_healthy": true
+  },
+  "automation": {
+    "trigger_type": "CLOCK",
+    "configured_interval_minutes": 15,
+    "executor_triggers_expected": 1,
+    "executor_triggers_found_at_closure": 1,
+    "executor_triggers_removed_at_closure": 1,
+    "executor_triggers_remaining_at_end": 0,
+    "active_grants_at_end": 0,
+    "active_leases_at_end": 0,
+    "active_windows_at_end": 0
+  },
+  "change_detection": {
+    "metadata_based": true,
+    "used_modified_time": true,
+    "used_reference_hash": true,
+    "read_all_cells_during_detection": false,
+    "required_confirmation_intervals": 8,
+    "required_confirmation_minutes": 120,
+    "cycle_started_only_after_threshold": true
+  },
+  "pipeline": {
+    "first_operational_stage": "02_DETECCAO_MUDANCA",
+    "last_operational_stage": "13_FINALIZACAO_CICLO",
+    "stages": [
+      {
+        "order": 2,
+        "name": "change_detection",
+        "purpose": "Detectar mudança na origem sem leitura integral de células."
+      },
+      {
+        "order": 3,
+        "name": "capture",
+        "purpose": "Capturar uma geração após a confirmação da mudança."
+      },
+      {
+        "order": 4,
+        "name": "candidate_validation",
+        "purpose": "Validar a estrutura candidata."
+      },
+      {
+        "order": 5,
+        "name": "candidate_views",
+        "purpose": "Criar views sobre a geração candidata."
+      },
+      {
+        "order": 6,
+        "name": "candidate_views_validation",
+        "purpose": "Validar contagens, regras e assinaturas candidatas."
+      },
+      {
+        "order": 7,
+        "name": "native_backup",
+        "purpose": "Preservar a geração oficial anterior."
+      },
+      {
+        "order": 8,
+        "name": "native_promotion",
+        "purpose": "Promover as tabelas candidatas aprovadas."
+      },
+      {
+        "order": 9,
+        "name": "post_promotion_validation",
+        "purpose": "Validar a geração oficial após a promoção."
+      },
+      {
+        "order": 10,
+        "name": "publication_decision",
+        "purpose": "Determinar se a publicação poderia prosseguir."
+      },
+      {
+        "order": 11,
+        "name": "shadow_publication",
+        "purpose": "Publicar valores processados na shadow."
+      },
+      {
+        "order": 12,
+        "name": "publication_validation",
+        "purpose": "Validar a publicação e remover resíduos temporários."
+      },
+      {
+        "order": 13,
+        "name": "cycle_finalization",
+        "purpose": "Concluir o ciclo e retornar ao estado de espera."
+      }
+    ],
+    "candidate_generation_used": true,
+    "native_backup_used": true,
+    "post_promotion_validation_used": true,
+    "shadow_publication_used": true,
+    "automatic_audit_used": true
+  },
+  "bigquery": {
+    "environment": "sandbox",
+    "billing_account_attached": false,
+    "financial_charge_observed": false,
+    "reference_cycle": {
+      "total_jobs": 13,
+      "jobs_with_processing": 9,
+      "bytes_processed": 88789912,
+      "processed_mebibytes_approx": 84.68,
+      "billable_bytes_metric": 181403648,
+      "billable_mebibytes_approx": 173.0,
+      "approximate_percentage_of_one_tib": 0.0165
+    },
+    "storage_policy": {
+      "mandatory_expiration_respected": true,
+      "native_retention_days": 59,
+      "permanent_retention_used": false
+    },
+    "interpretation": {
+      "billable_bytes_represent_actual_charge": false,
+      "monthly_consumption_measured": false,
+      "reference_cycle_used_for_projection": true
+    }
+  },
+  "publication": {
+    "reference_cycle": {
+      "published_rows": 9009,
+      "published_cells": 114575,
+      "technical_formulas": 0,
+      "sanitized_values": 2340,
+      "duration_milliseconds": 87404
+    },
+    "accumulated": {
+      "published_rows": 30904,
+      "published_cells": 440653
+    },
+    "publication_target": "shadow",
+    "production_modified": false,
+    "formulas_replaced_by_processed_values_in_technical_tabs": true
+  },
+  "audit": {
+    "audits_registered_in_final_consolidation": 1,
+    "approved_audits": 1,
+    "final_verdict": "INTEGRIDADE APROVADA",
+    "reference_duration_milliseconds": 13556,
+    "production_modified": false,
+    "bigquery_objects_modified_during_audit": false,
+    "unexpected_tabs_found": false,
+    "unexpected_formulas_found": false,
+    "blocking_residual_objects_found": false
+  },
+  "performance": {
+    "samples": 30,
+    "average_milliseconds": 12715.33,
+    "median_milliseconds": 2269,
+    "p95_milliseconds": 62315.15,
+    "minimum_milliseconds": 304,
+    "maximum_milliseconds": 92083,
+    "samples_below_25000_milliseconds": 26,
+    "percentage_below_25000_milliseconds": 86.67,
+    "assessment": "approved_with_reservations",
+    "main_observed_bottleneck": "Google Sheets publication"
+  },
+  "slowest_operations": [
+    {
+      "rank": 1,
+      "operation": "publication_recovery_reference",
+      "duration_milliseconds": 92083
+    },
+    {
+      "rank": 2,
+      "operation": "shadow_publication",
+      "duration_milliseconds": 87404
+    },
+    {
+      "rank": 3,
+      "operation": "optimized_capture",
+      "duration_milliseconds": 31651
+    },
+    {
+      "rank": 4,
+      "operation": "native_promotion",
+      "duration_milliseconds": 31001
+    },
+    {
+      "rank": 5,
+      "operation": "post_promotion_validation",
+      "duration_milliseconds": 22082
+    }
+  ],
+  "apps_script_budget": {
+    "configured_daily_budget_minutes": 70,
+    "preventive_reserve_minutes": 5,
+    "reference_final_daily_consumption_minutes": 10.18785,
+    "reference_final_daily_usage_percentage": 14.55,
+    "highest_observed_daily_consumption_minutes": 13.36,
+    "highest_observed_daily_usage_percentage": 19.09,
+    "budget_exceeded": false
+  },
+  "security": {
+    "production_read_only": true,
+    "production_cells_modified": false,
+    "production_structure_modified": false,
+    "production_trigger_created": false,
+    "shadow_separated_from_production": true,
+    "execution_lock_used": true,
+    "grant_control_used": true,
+    "lease_control_used": true,
+    "manual_authorizations_closed_by_default": true,
+    "preflight_used_for_sensitive_operations": true,
+    "values_sanitized_before_publication": true,
+    "backups_preserved_before_promotion": true,
+    "automatic_closure_validated": true,
+    "residual_executor_triggers_at_end": 0
+  },
+  "incidents": [
+    {
+      "id": "I-01",
+      "type": "false_positive",
+      "summary": "Divergência histórica causada por uma view com janela temporal móvel.",
+      "impact": "Auditoria inicialmente poderia interpretar evolução temporal como alteração indevida.",
+      "recovery": "Comparação histórica passou a ser informativa e a integridade foi validada por critérios independentes.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-02",
+      "type": "activation_block",
+      "summary": "Janela anterior persistida como registro histórico inativo.",
+      "impact": "Nova ativação foi bloqueada pela existência da propriedade.",
+      "recovery": "Ativação passou a diferenciar presença histórica de atividade operacional.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-03",
+      "type": "false_block",
+      "summary": "Validação exigia igualdade entre linhas com conteúdo e registros da view clean.",
+      "impact": "Ciclo foi interrompido após a promoção.",
+      "recovery": "Regra foi corrigida para validar a view clean como subconjunto das linhas com conteúdo.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-04",
+      "type": "preserved_failure",
+      "summary": "Ciclo entrou em estado de falha preservada após o bloqueio pós-promoção.",
+      "impact": "Etapas posteriores foram impedidas.",
+      "recovery": "Janela foi encerrada e o ciclo foi retomado posteriormente por recuperação controlada.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-05",
+      "type": "publication_recovery",
+      "summary": "A publicação exigiu uma recuperação antes da aprovação definitiva.",
+      "impact": "Ciclo não poderia ser finalizado imediatamente.",
+      "recovery": "Publicação foi revalidada e o histórico do bloqueio foi preservado.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-06",
+      "type": "orphan_staging",
+      "summary": "Um staging temporário permaneceu após a publicação.",
+      "impact": "Aba técnica inesperada impedia a validação final.",
+      "recovery": "O staging específico foi removido seletivamente e a publicação foi validada novamente.",
+      "final_status": "resolved"
+    },
+    {
+      "id": "I-07",
+      "type": "performance_reservation",
+      "summary": "Algumas etapas ultrapassaram a referência genérica de 25 segundos.",
+      "impact": "Ressalva de performance sem perda de integridade.",
+      "recovery": "Resultados foram classificados por tipo de etapa e volume processado.",
+      "final_status": "documented"
+    }
+  ],
+  "recovery": {
+    "preserved_failure_state_tested": true,
+    "automatic_resume_after_preserved_failure": false,
+    "automatic_closure_after_preserved_failure": true,
+    "same_cycle_resumed": true,
+    "manual_preflight_required": true,
+    "temporary_manual_authorization_required": true,
+    "new_controlled_window_created": true,
+    "single_executor_trigger_created": true,
+    "completed_after_recovery": true,
+    "final_integrity_approved": true
+  },
+  "final_assertions": [
+    {
+      "id": "A-01",
+      "statement": "O pipeline operou no BigQuery Sandbox sem faturamento durante a janela avaliada.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "A-02",
+      "statement": "A produção permaneceu somente leitura durante o experimento.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "A-03",
+      "statement": "O pipeline concluiu ciclos recorrentes e aprovados.",
+      "evidence_level": "E2",
+      "supported": true
+    },
+    {
+      "id": "A-04",
+      "statement": "Falhas interromperam a continuidade automática e preservaram evidências.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "A-05",
+      "statement": "O mesmo ciclo pôde ser recuperado sem reiniciar integralmente o pipeline.",
+      "evidence_level": "E1",
+      "supported": true
+    },
+    {
+      "id": "A-06",
+      "statement": "A publicação no Google Sheets foi o principal gargalo observado.",
+      "evidence_level": "E2",
+      "supported": true
+    },
+    {
+      "id": "A-07",
+      "statement": "Habilitar faturamento resolveria o problema estrutural da planilha.",
+      "evidence_level": "E2",
+      "supported": false
+    },
+    {
+      "id": "A-08",
+      "statement": "O experimento comprova adequação automática para qualquer ambiente de produção.",
+      "evidence_level": "E4",
+      "supported": false
+    }
+  ],
+  "limitations": [
+    "A janela avaliada teve aproximadamente 48 horas.",
+    "O volume observado pertence a um caso específico.",
+    "O experimento não avaliou milhares de usuários simultâneos.",
+    "O experimento não avaliou streaming.",
+    "O experimento não avaliou disaster recovery entre regiões.",
+    "O experimento não avaliou o BigQuery como banco operacional.",
+    "As projeções mensais não representam consumo mensal medido.",
+    "O pipeline experimental não integra a arquitetura do Celebra Connect."
+  ],
+  "related_documents": [
+    "README.md",
+    "SECURITY.md",
+    "docs/architecture.md",
+    "docs/methodology.md",
+    "docs/results.md",
+    "docs/sandbox-and-billing.md",
+    "docs/incidents-and-recovery.md",
+    "docs/use-cases.md",
+    "docs/adaptation-guide.md",
+    "evidence/test-matrix.md"
+  ]
+}
