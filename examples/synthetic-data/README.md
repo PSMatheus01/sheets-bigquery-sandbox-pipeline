@@ -1,4 +1,4 @@
-# Dados sintéticos
+		# Dados sintéticos
 
 ## 1. Objetivo
 
@@ -36,15 +36,22 @@ Os dados foram construídos manualmente para permitir testes de:
 
 ## 2. Arquivos da pasta
 
-### Arquivo disponível
-
 | Arquivo | Formato | Finalidade |
 |---|---|---|
 | `input-example.csv` | CSV | Fonte sintética principal utilizada nos exemplos do pipeline |
+| `team-example.csv` | CSV | Referência sintética de equipes, grupos, validade e capacidade |
 
-O arquivo contém registros válidos e registros intencionalmente inconsistentes.
+O arquivo principal contém registros válidos e registros intencionalmente inconsistentes.
 
-As inconsistências fazem parte do conjunto de teste e não devem ser corrigidas diretamente no CSV.
+O arquivo de equipes permite validar:
+
+- existência da equipe;
+- situação ativa ou inativa;
+- período de validade;
+- agrupamento;
+- capacidade diária de referência.
+
+As inconsistências fazem parte do conjunto de teste e não devem ser corrigidas diretamente nos arquivos CSV.
 
 ---
 
