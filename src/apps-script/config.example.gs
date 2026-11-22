@@ -1,3 +1,4 @@
+		
 /**
  * sheets-bigquery-sandbox-pipeline
  * Arquivo: config.example.gs
@@ -168,8 +169,31 @@ function sbspValidateConfig_() {
     errors.push('A criação de gatilhos deve permanecer desabilitada.');
   }
 
-  if (SBSP_CONFIG.publication.enabled !== false) {
-    errors.push('A publicação deve permanecer desabilitada por padrão.');
+  if (
+    SBSP_CONFIG.publication.enabled === true &&
+    SBSP_CONFIG.syntheticDataOnly !== true
+  ) {
+    errors.push(
+      'A publicação só pode ser habilitada com dados sintéticos.'
+    );
+  }
+
+  if (
+    SBSP_CONFIG.publication.enabled === true &&
+    SBSP_CONFIG.execution.manualExecutionOnly !== true
+  ) {
+    errors.push(
+      'A publicação sintética exige execução exclusivamente manual.'
+    );
+  }
+
+  if (
+    SBSP_CONFIG.publication.enabled === true &&
+    SBSP_CONFIG.execution.manualAuthorizationRequired !== true
+  ) {
+    errors.push(
+      'A publicação sintética exige autorização manual.'
+    );
   }
 
   if (SBSP_CONFIG.publication.writeFormulas !== false) {
