@@ -11,7 +11,7 @@
     "synthetic_data_only": true
   },
   "bigquery": {
-    "project_id": "your-sandbox-project-id",
+    "project_id": "sheets-bq-sandbox-pipeline",
     "dataset_id": "sandbox_pipeline_example",
     "location": "US",
     "use_legacy_sql": false,
